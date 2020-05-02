@@ -2,28 +2,27 @@ import {
   Node, DataLoader, collateForDataloader,
 } from '@via-profit-services/core';
 import { Context } from '../../context';
-import LegalEntityService, { ILegalEntity } from './service';
-
+import SettingsService, { SettingsNode } from './service';
 
 interface Loaders {
-  legalEntities: DataLoader<string, Node<ILegalEntity>>;
+  settings: DataLoader<string, SettingsNode>;
 }
 
 const loaders: Loaders = {
-  legalEntities: null,
+  settings: null,
 };
 
 
 export default function createLoaders(context: Context) {
-  if (loaders.legalEntities !== null) {
+  if (loaders.settings !== null) {
     return loaders;
   }
 
-  const service = new LegalEntityService({ context });
+  const service = new SettingsService({ context });
 
   // eslint-disable-next-line arrow-body-style
-  loaders.legalEntities = new DataLoader<string, Node<ILegalEntity>>((ids: string[]) => {
-    return service.getLegalEntitiesByIds(ids)
+  loaders.settings = new DataLoader<string, Node<SettingsNode>>((ids: string[]) => {
+    return service.getSettingsByIds(ids)
       .then((nodes) => collateForDataloader(ids, nodes));
   });
 

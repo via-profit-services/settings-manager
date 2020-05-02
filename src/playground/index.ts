@@ -3,13 +3,50 @@ import { App, schemas } from '@via-profit-services/core';
 import chalk from 'chalk';
 import { v4 as uuidv4 } from 'uuid';
 
-import { typeDefs, permissions, resolvers } from '../schemas/settings-manager';
+import * as settingsManager from '../schemas/settings-manager';
 import { configureApp } from '../utils/configureApp';
 
+const { Category, makeSchema } = settingsManager;
+
+const settingsParams = makeSchema({
+  accounts: [
+    {
+      category: Category.ui,
+      name: ['theme', 'menu'],
+    },
+    {
+      category: Category.ui,
+      name: ['color'],
+    },
+    {
+      category: Category.constraint,
+      name: ['maxSessions'],
+    },
+  ],
+  main: [
+    {
+      category: Category.contact,
+      name: ['adminEmail'],
+    },
+    {
+      category: Category.label,
+      name: ['companyDisplayName'],
+    },
+  ],
+});
+
 const config = configureApp({
-  typeDefs: [typeDefs],
-  permissions: [permissions],
-  resolvers: [resolvers],
+  typeDefs: [
+    settingsManager.typeDefs,
+    settingsParams.typeDefs,
+  ],
+  permissions: [
+    settingsManager.permissions,
+  ],
+  resolvers: [
+    settingsManager.resolvers,
+    settingsParams.resolvers,
+  ],
 });
 const app = new App(config);
 const AuthService = schemas.auth.service;

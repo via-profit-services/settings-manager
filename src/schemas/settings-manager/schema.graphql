@@ -1,7 +1,48 @@
 extend type Query {
-  settings: SettingsQuery!
+
+  """
+  Returns any setting
+  """
+  settings(
+    """
+    If this property was set then settings will be returns only for this owner ID
+    """
+    owner: ID
+  ): SettingsCollection!
 }
 
-extend type Mutation {
-  settings: SettingsMutation!
+enum SettingsCategory {
+  general
+  ui
+  contact
+  constraint
+  currency
+  size
+  label
+  other
 }
+
+"""
+Settings collection.
+"""
+type SettingsCollection {
+  common: SettingsCommonGroup!
+}
+
+"""
+Group of settings fields
+"""
+type SettingsCommonGroup {
+  contact: SettingsCommonFields!
+}
+
+type SettingsCommonFields {
+  developer: SettingsValue
+}
+
+"""
+Special data type for Settings results
+This type can be JSONObject type or any basic type
+Please don't use this type anywhere else
+"""
+scalar SettingsValue

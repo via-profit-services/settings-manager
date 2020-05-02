@@ -1,20 +1,24 @@
 import { IResolvers } from 'graphql-tools';
-import { Context } from '../../../context';
 
-import LegalEntitiesMutationResolver from './LegalEntitiesMutation';
-import LegalEntitiesQueryResolver from './LegalEntitiesQuery';
-import LegalEntityResolver from './LegalEntity';
+import { Context } from '../../../context';
 
 const resolvers: IResolvers<any, Context> = {
   Query: {
-    legalEntities: () => ({}),
+    settings: (parent, args) => (args),
   },
-  Mutation: {
-    legalEntities: () => ({}),
+  SettingsCollection: {
+    common: () => ({}),
   },
-  LegalEntity: LegalEntityResolver,
-  LegalEntitiesQuery: LegalEntitiesQueryResolver,
-  LegalEntitiesMutation: LegalEntitiesMutationResolver,
+  SettingsCommonGroup: {
+    contact: () => ({}),
+  },
+  SettingsCommonFields: {
+    developer: () => 'Via Profit',
+  },
 };
+
+interface TSource {
+  owner?: string;
+}
 
 export default resolvers;
