@@ -137,7 +137,16 @@ export const makeSchema = (params: MakeSchemaParams) => {
             }
 
             try {
-              const filteredList = settingsList.filter((settingsField) => {
+              const [filteredListOfDefaults] = settingsList.filter((settingsField) => {
+                return (
+                  settingsField.group === group
+                  && settingsField.category === category
+                  && settingsField.name === mname
+                  && settingsField.owner === null
+                );
+              });
+
+              const [filteredList] = settingsList.filter((settingsField) => {
                 return (
                   settingsField.group === group
                 && settingsField.category === category
@@ -146,7 +155,7 @@ export const makeSchema = (params: MakeSchemaParams) => {
                 );
               });
 
-              return filteredList[0];
+              return (filteredList || filteredListOfDefaults) || null;
             } catch (err) {
               throw new ServerError(
                 `Failed to get settings for current query «${group}»->${category}»->«${mname}»->«${owner || 'without owner'}»`, { err },
