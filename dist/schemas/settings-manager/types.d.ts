@@ -8,3 +8,13 @@ export declare enum TSettingsCategory {
     label = "label",
     other = "other"
 }
+export interface MakeSchemaParams {
+    /** Group name */
+    [key: string]: Array<{
+        /** Settings category preset */
+        category: TSettingsCategory;
+        /** Settings field name */
+        name: string | string[];
+        owner?: string;
+    }>;
+}
