@@ -6,30 +6,33 @@ import { v4 as uuidv4 } from 'uuid';
 import * as settingsManager from '../schemas/settings-manager';
 import { configureApp } from '../utils/configureApp';
 
-const { Category, makeSchema } = settingsManager;
+const { TSettingsCategory, makeSchema } = settingsManager;
+
 
 const settingsParams = makeSchema({
-  accounts: [
+  layout: [
     {
-      category: Category.ui,
+      category: TSettingsCategory.ui,
       name: ['theme', 'menu'],
     },
     {
-      category: Category.ui,
+      category: TSettingsCategory.ui,
       name: ['color'],
     },
+  ],
+  accounts: [
     {
-      category: Category.constraint,
+      category: TSettingsCategory.constraint,
       name: ['maxSessions'],
     },
   ],
   main: [
     {
-      category: Category.contact,
+      category: TSettingsCategory.contact,
       name: ['adminEmail'],
     },
     {
-      category: Category.label,
+      category: TSettingsCategory.label,
       name: ['companyDisplayName'],
     },
   ],

@@ -30,12 +30,14 @@ export async function up(knex: Knex): Promise<any> {
       "owner" uuid NULL,
       "name" varchar(100) NOT NULL,
       "value" jsonb NOT NULL DEFAULT '{}'::jsonb,
+      "comment" text NULL,
       CONSTRAINT settings_pk PRIMARY KEY (id),
-      CONSTRAINT settings_un UNIQUE ("group", "category", "name")
+      CONSTRAINT settings_un UNIQUE ("group", "category", "name", "owner")
     );
     
     comment on column "settings"."group" is 'Usually, the module name is used as the group name';
     comment on column "settings"."category" is 'Just the name of the settings category, for example, for a catalog - items;category;orders';
+    comment on column "settings"."comment" is 'Just comment of this settings field for internal usage';
   `);
 }
 

@@ -38,18 +38,25 @@
     "author": "Via Profit <promo@via-profit.ru>",
     "license": "MIT",
     "dependencies": {
-        "@via-profit-services/core": "ssh://git@gitlab.com:via-profit-services/core.git#semver:^0.16.0",
+        "@via-profit-services/core": "ssh://git@gitlab.com:via-profit-services/core.git#semver:^0.17.0",
         "graphql": "^14.6.0",
         "graphql-shield": "^7.2.2",
         "graphql-tools": "^4.0.7",
-        "uuid": "^7.0.2"
+        "lodash": "^4.17.15",
+        "moment": "^2.25.1",
+        "moment-timezone": "^0.5.28",
+        "uuid": "^7.0.2",
+        "winston": "^3.2.1",
+        "winston-daily-rotate-file": "^4.4.2"
     },
     "devDependencies": {
         "@jagi/jest-transform-graphql": "^1.0.2",
         "@types/express-serve-static-core": "^4.17.2",
         "@types/faker": "^4.1.10",
+        "@types/ioredis": "^4.16.0",
         "@types/jest": "^24.0.23",
         "@types/knex": "^0.16.1",
+        "@types/lodash": "^4.14.150",
         "@types/minimist": "^1.2.0",
         "@types/moment-timezone": "^0.5.12",
         "@types/supertest": "^2.0.8",

@@ -1,23 +1,15 @@
 /* eslint-disable import/prefer-default-export */
-import { IFieldResolver } from 'graphql-tools';
-import { Context } from '../../context';
-import createLoaders from './loaders';
+import { ServerError } from '@via-profit-services/core';
 
-export enum Category {
-  general = 'general',
-  ui = 'ui',
-  contact = 'contact',
-  constraint = 'constraint',
-  currency = 'currency',
-  size = 'size',
-  label = 'label',
-  other = 'other'
-}
+import { Context } from '../../context';
+import { REDIS_FIELDNAME, REDIS_HASHNAME, ISettingsNode } from './service';
+
+import { TSettingsCategory } from './types';
 
 interface MakeSchemaParams {
   /** Group name */
   [key: string]: Array<{
-    category: Category;
+    category: TSettingsCategory;
     name: string | string[];
     owner?: string;
   }>;
@@ -46,23 +38,23 @@ export const makeSchema = (params: MakeSchemaParams) => {
 
     // define fields
     categories.forEach((category) => {
-      const capitalizeCategory = category.charAt(0).toUpperCase() + category.slice(1);
-      const namesOfThisCategory = dataArray.filter((d) => d.category === category);
+      const capitalizeTSettingsCategory = category.charAt(0).toUpperCase() + category.slice(1);
+      const namesOfThisTSettingsCategory = dataArray.filter((d) => d.category === category);
 
       typeDefs.push(`
         """
-        Type of «${capitalizeGroup}» group for «${capitalizeCategory}» category
+        Type of «${capitalizeGroup}» group for «${capitalizeTSettingsCategory}» category
         This type was generated automatically
         """
-        type Settings${capitalizeGroup}${capitalizeCategory}Fields {
+        type Settings${capitalizeGroup}${capitalizeTSettingsCategory}Fields {
       `);
 
-      namesOfThisCategory.forEach(({ name }) => {
+      namesOfThisTSettingsCategory.forEach(({ name }) => {
         const names = Array.isArray(name) ? name : [name];
         names.forEach((mname) => {
           typeDefs.push(`
             """
-            «${mname}» options of «${capitalizeGroup}» group for «${capitalizeCategory}» category
+            «${mname}» options of «${capitalizeGroup}» group for «${capitalizeTSettingsCategory}» category
             This type was generated automatically
             """
             ${mname}: SettingsValue!
@@ -84,7 +76,7 @@ export const makeSchema = (params: MakeSchemaParams) => {
     `);
 
     categories.forEach((category, index) => {
-      const capitalizeCategory = category.charAt(0).toUpperCase() + category.slice(1);
+      const capitalizeTSettingsCategory = category.charAt(0).toUpperCase() + category.slice(1);
       if (index === 0) {
         // define group
         typeDefs.push(`
@@ -97,7 +89,7 @@ export const makeSchema = (params: MakeSchemaParams) => {
       }
 
       typeDefs.push(`
-        ${category}: Settings${capitalizeGroup}${capitalizeCategory}Fields!
+        ${category}: Settings${capitalizeGroup}${capitalizeTSettingsCategory}Fields!
       `);
 
 
@@ -129,36 +121,52 @@ export const makeSchema = (params: MakeSchemaParams) => {
     // define group
     resolvers[`Settings${capitalizeGroup}Group`] = {};
     categories.forEach((category) => {
-      const namesOfThisCategory = dataArray.filter((d) => d.category === category);
+      const namesOfThisTSettingsCategory = dataArray.filter((d) => d.category === category);
 
       // append category into the group
-      resolvers[`Settings${capitalizeGroup}Group`][category] = (parent: TSource) => parent;
+      resolvers[`Settings${capitalizeGroup}Group`][category] = async (parent: TSource) => {
+        return parent;
+      };
 
       const obj: any = {};
-      namesOfThisCategory.forEach(({ name }) => {
+      namesOfThisTSettingsCategory.forEach(({ name }) => {
         const names = Array.isArray(name) ? name : [name];
         names.forEach((mname) => {
-          const resolver: IFieldResolver<TSource, Context> = async (
-            parent: TSource, args, context, info) => {
+          obj[mname] = async (parent: any, args: any, context: Context) => {
             const { owner } = parent;
+            const { redis } = context;
 
-            const id = [
-              info.path.prev.prev.prev.key, // group
-              info.path.prev.prev.key, // category
-              info.path.prev.key, // field
-              owner,
-            ].join('|');
+            const cache = await redis.hget(REDIS_HASHNAME, REDIS_FIELDNAME);
+            let settingsList: ISettingsNode[] = [];
 
-            const loaders = createLoaders(context);
-            const settings = await loaders.settings.load(id);
+            try {
+              settingsList = JSON.parse(cache) as ISettingsNode[];
+            } catch (err) {
+              throw new ServerError('Failed to read settings', { err });
+            }
 
-            return settings ? settings.value : null;
+            try {
+              const filteredList = settingsList.filter((settingsField) => {
+                return (
+                  settingsField.group === group
+                && settingsField.category === category
+                && settingsField.name === mname
+                && settingsField.owner === (owner || null)
+                );
+              });
+
+              return filteredList[0];
+            } catch (err) {
+              throw new ServerError(
+                `Failed to get settings for current query «${group}»->${category}»->«${mname}»->«${owner || 'without owner'}»`, { err },
+              );
+            }
           };
-          obj[mname] = resolver;
         });
       });
-      const capitalizeCategory = category.charAt(0).toUpperCase() + category.slice(1);
-      resolvers[`Settings${capitalizeGroup}${capitalizeCategory}Fields`] = obj;
+
+      const capitalizeTSettingsCategory = category.charAt(0).toUpperCase() + category.slice(1);
+      resolvers[`Settings${capitalizeGroup}${capitalizeTSettingsCategory}Fields`] = obj;
     });
   });
   // console.log('');

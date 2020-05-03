@@ -5,6 +5,8 @@ import { IInitProps, configureLogger } from '@via-profit-services/core';
 import dotenv from 'dotenv';
 import moment from 'moment-timezone';
 
+import { configureSettingsLogger } from '../schemas/settings-manager';
+
 // project root path
 const rootPath = path.join(__dirname, '..', '..');
 
@@ -13,9 +15,17 @@ dotenv.config({
   path: path.resolve(__dirname, '../../.env'),
 });
 
-const logger = configureLogger({
+const settingsLogger = configureSettingsLogger({
   logDir: path.resolve(rootPath, process.env.LOG),
 });
+
+const logger = configureLogger({
+  logDir: path.resolve(rootPath, process.env.LOG),
+  loggers: {
+    settings: settingsLogger,
+  },
+});
+
 
 moment.tz.setDefault(process.env.TIMEZONE);
 
@@ -74,7 +84,6 @@ const serverConfig: IInitProps = {
   },
 };
 
-console.log(process.env.SSL_KEY);
 const configureApp = (props?: IProps): IInitProps => {
   const { typeDefs, resolvers, permissions } = props || {};
   return {
