@@ -4,16 +4,7 @@ import { ServerError } from '@via-profit-services/core';
 import { Context } from '../../context';
 import { REDIS_FIELDNAME, REDIS_HASHNAME, ISettingsNode } from './service';
 
-import { TSettingsCategory } from './types';
-
-interface MakeSchemaParams {
-  /** Group name */
-  [key: string]: Array<{
-    category: TSettingsCategory;
-    name: string | string[];
-    owner?: string;
-  }>;
-}
+import { MakeSchemaParams } from './types';
 
 interface TSource {
   owner?: string;

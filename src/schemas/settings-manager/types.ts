@@ -1,4 +1,3 @@
-/* eslint-disable import/prefer-default-export */
 
 export enum TSettingsCategory {
   general = 'general',
@@ -9,4 +8,19 @@ export enum TSettingsCategory {
   size = 'size',
   label = 'label',
   other = 'other'
+}
+
+
+export interface MakeSchemaParams {
+  /** Group name */
+  [key: string]: Array<{
+
+    /** Settings category preset */
+    category: TSettingsCategory;
+
+    /** Settings field name */
+    name: string | string[];
+
+    owner?: string;
+  }>;
 }
