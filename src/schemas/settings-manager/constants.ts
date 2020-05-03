@@ -1,0 +1,13 @@
+import {
+  LOG_MAZ_FILES, LOG_MAZ_SIZE, LOG_DATE_PATTERNT, LOG_FILENAME_DEBUG, LOG_FILENAME_ERRORS,
+} from '@via-profit-services/core';
+
+export const LOG_FILENAME_SETTINGS = 'settings-%DATE%.log';
+
+export {
+  LOG_MAZ_FILES,
+  LOG_MAZ_SIZE,
+  LOG_DATE_PATTERNT,
+  LOG_FILENAME_DEBUG,
+  LOG_FILENAME_ERRORS,
+};

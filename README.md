@@ -14,7 +14,7 @@
 ### Установка
 
 ```bash
-yarn add ssh://git@gitlab.com:via-profit-services/settings-manager.git#semver:^0.0.0
+yarn add ssh://git@gitlab.com:via-profit-services/settings-manager.git#semver:^0.1.0
 ```
 
 

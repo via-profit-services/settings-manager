@@ -1,7 +1,109 @@
 extend type Query {
-  settings: SettingsQuery!
+
+  """
+  Returns any setting
+  """
+  settings(
+    """
+    If this property was set then settings will be returns only for this owner ID
+    """
+    owner: ID
+  ): SettingsCollection!
 }
 
 extend type Mutation {
   settings: SettingsMutation!
+}
+
+type SettingsMutation {
+
+  """
+  Update single settings field
+  """
+  update(
+    """
+    Settings geoup name
+    """
+    group: String!
+    category: SettingsCategory!
+    """
+    Settings field name
+    """
+    name: String!
+
+    """
+    Settings value
+    """
+    value: JSON!
+
+    """
+    If this property was set then settings will be updated only for this owner ID
+    """
+    owner: String
+    ): SettingsValue!
+}
+
+"""
+Category of the settings
+"""
+enum SettingsCategory {
+  general
+  ui
+  contact
+  constraint
+  currency
+  size
+  label
+  other
+}
+
+"""
+Settings collection.
+"""
+type SettingsCollection {
+  common: SettingsCommonGroup!
+}
+
+"""
+Group of settings fields
+"""
+type SettingsCommonGroup {
+  contact: SettingsCommonFields!
+}
+
+type SettingsCommonFields {
+  developer: SettingsValue
+}
+
+"""
+Settings results bag
+"""
+type SettingsValue {
+  id: ID!
+
+  """
+  Creation date of this settings field
+  """
+  createdAt: DateTime!
+
+  """
+  Updated date of this settings field
+  """
+  updatedAt: DateTime!
+
+  """
+  The presence of this parameter determines whether the parameter is shared by all or personal to this owner
+  """
+  owner: String
+
+  """
+  Settings group name
+  """
+  group: String!
+  category: SettingsCategory!
+
+  """
+  Settings value
+  """
+  value: JSON
 }

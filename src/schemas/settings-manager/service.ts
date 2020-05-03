@@ -1,26 +1,48 @@
+/* eslint-disable class-methods-use-this */
+// import { v4 as uuidv4 } from 'uuid';
 import {
-  IListResponse,
-  TOutputFilter,
-  convertOrderByToKnex,
-  convertWhereToKnex,
-  TWhereAction,
+  TOutputFilter, TWhereAction, convertWhereToKnex, convertOrderByToKnex, convertJsonToKnex,
 } from '@via-profit-services/core';
+
 import moment from 'moment-timezone';
-import { v4 as uuidv4 } from 'uuid';
 
 import { Context } from '../../context';
+import { TSettingsCategory } from './types';
 
-class LegalEntitiesService {
+export const REDIS_HASHNAME = 'viaprofitservices';
+export const REDIS_FIELDNAME = 'settings';
+
+
+interface IProps {
+  context: Context;
+}
+
+export interface ISettingsNode {
+  createdAt: Date;
+  updatedAt: Date;
+  id: string;
+  owner: string;
+  group: string;
+  name: string;
+  value: any;
+  category: TSettingsCategory;
+}
+
+type TSettingsTable = ISettingsNode;
+type TSettingsTableInput = Omit<ISettingsNode, 'createdAt' | 'updatedAt'> & {
+  createdAt: string;
+  updatedAt: string;
+};
+
+
+class SettingsService {
   public props: IProps;
 
   public constructor(props: IProps) {
     this.props = props;
   }
 
-  public async getLegalEntities(
-    filter: Partial<TOutputFilter>,
-    withDeleted?: boolean,
-  ): Promise<IListResponse<ILegalEntity>> {
+  public async getSettings(filter: Partial<TOutputFilter>): Promise<ISettingsNode[]> {
     const { context } = this.props;
     const { knex } = context;
     const {
@@ -31,40 +53,26 @@ class LegalEntitiesService {
       search,
     } = filter;
 
-    where.push(['deleted', TWhereAction.EQ, withDeleted ? 'true' : 'false']);
 
     if (search) {
       where.push([search.field, TWhereAction.ILIKE, `%${search.query}%`]);
     }
 
-    const connection = await knex
+    const settingsList = await knex
       .select([
         '*',
-        knex.raw('count(*) over() as "totalCount"'),
       ])
-      .from<any, ILegalEntityTable[]>('legalEntities')
+      .from<any, TSettingsTable[]>('settings')
       .limit(limit || 1)
       .offset(offset || 0)
       .where((builder) => convertWhereToKnex(builder, where))
-      .orderBy(convertOrderByToKnex(orderBy))
+      .orderBy(convertOrderByToKnex(orderBy));
 
-      .then((nodes) => ({
-        totalCount: nodes.length ? Number(nodes[0].totalCount) : 0,
-        nodes,
-      }));
-
-    return {
-      ...connection,
-      offset,
-      limit,
-      where,
-      orderBy,
-    };
+    return settingsList;
   }
 
-
-  public async getLegalEntitiesByIds(ids: string[]): Promise<ILegalEntity[]> {
-    const { nodes } = await this.getLegalEntities({
+  public async getSettingsByIds(ids: string[]): Promise<ISettingsNode[]> {
+    const nodes = await this.getSettings({
       where: [['id', TWhereAction.IN, ids]],
       offset: 0,
       limit: ids.length,
@@ -73,95 +81,56 @@ class LegalEntitiesService {
     return nodes;
   }
 
-  public async getLegalEntity(id: string): Promise<ILegalEntity | false> {
-    const nodes = await this.getLegalEntitiesByIds([id]);
-    return nodes.length ? nodes[0] : false;
-  }
 
-  public async updateLegalEntity(id: string, legalEntityData: Partial<ILegalEntityUpdateInfo>) {
-    const { knex, timezone } = this.props.context;
+  public async updateSettings(id: string, settingsField: Partial<ISettingsNode>): Promise<string> {
+    const {
+      knex, timezone,
+    } = this.props.context;
 
     const data = {
-      ...legalEntityData,
-      id, // force set id
+      ...settingsField,
+      id,
+      value: convertJsonToKnex(knex, settingsField.value),
       updatedAt: moment.tz(timezone).format(),
     };
-    const result = await knex<ILegalEntityUpdateInfo>('legalEntities')
+    const [affectedId]: string[] = await knex<Partial<TSettingsTableInput>>('settings')
       .update(data)
       .where('id', id)
       .returning('id');
 
-    return result[0];
+    return affectedId;
   }
 
-  public async createLegalEntity(
-    legalEntityData: ILegalEntityCreateInfo,
-  ): Promise<string> {
-    const { knex, timezone } = this.props.context;
+  public async createSettings(settingsField: Omit<ISettingsNode, 'createdAt' | 'updatedAt'>): Promise<string> {
+    const {
+      knex, timezone,
+    } = this.props.context;
 
     const data = {
-      ...legalEntityData,
-      id: legalEntityData.id || uuidv4(),
+      ...settingsField,
+      value: convertJsonToKnex(knex, settingsField.value),
       createdAt: moment.tz(timezone).format(),
       updatedAt: moment.tz(timezone).format(),
     };
-
-    const result = await knex<ILegalEntityUpdateInfo>('legalEntities')
+    const [affectedId]: string[] = await knex<Partial<TSettingsTableInput>>('settings')
       .insert(data)
       .returning('id');
 
-    return result[0];
+    return affectedId;
   }
 
-  public async deleteLegalEntity(id: string) {
-    const result = this.updateLegalEntity(id, {
-      inn: '',
-      deleted: true,
-    });
 
-    return Boolean(result);
+  public async deleteSettings(id: string): Promise<string> {
+    const { knex } = this.props.context;
+
+    const [deletedId]: string[] = await knex('settings')
+      .del()
+      .where({ id })
+      .returning('id');
+
+    return deletedId;
   }
 }
 
-interface IProps {
-  context: Context;
-}
-
-export interface ILegalEntity {
-  id: string;
-  createdAt: Date;
-  updatedAt: Date;
-  name: string;
-  address: string;
-  ogrn: string;
-  kpp?: string;
-  inn: string;
-  rs: string;
-  ks: string;
-  bic: string;
-  bank: string;
-  directorNameNominative: string;
-  directorNameGenitive: string;
-  deleted: Boolean;
-}
-
-
-export type ILegalEntityUpdateInfo = Omit<
-Partial<ILegalEntityCreateInfo>, 'id' | 'createdAt' | 'updatedAt'
-> & {
-  id?: string;
-  updatedAt: string;
-};
-
-export type ILegalEntityCreateInfo = Omit<ILegalEntity, 'id' | 'createdAt' | 'updatedAt'> & {
-  id?: string;
-  updatedAt: string;
-  createdAt: string;
-};
-
-type ILegalEntityTable = ILegalEntity & {
-  totalCount: number;
-};
-
-export default LegalEntitiesService;
-export { LegalEntitiesService };
+export default SettingsService;
+export { SettingsService };
