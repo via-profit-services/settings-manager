@@ -18,14 +18,19 @@ extend type Mutation {
 type SettingsMutation {
 
   """
-  Update single settings field
+  Set single settings field
   """
-  update(
+  set(
     """
     Settings geoup name
     """
     group: String!
+
+    """
+    Settings category
+    """
     category: SettingsCategory!
+
     """
     Settings field name
     """

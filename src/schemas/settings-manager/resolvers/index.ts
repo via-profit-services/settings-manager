@@ -1,5 +1,6 @@
 import { TWhereAction, ServerError } from '@via-profit-services/core';
 import { IResolvers } from 'graphql-tools';
+import { v4 as uuidv4 } from 'uuid';
 
 import { Context } from '../../../context';
 import SettingsService, { REDIS_FIELDNAME, REDIS_HASHNAME, ISettingsNode } from '../service';
@@ -46,15 +47,18 @@ const resolvers: IResolvers<any, Context> = {
     },
   }),
   SettingsMutation: {
-    update: async (parent, args: UpdateArgs, context) => {
+    set: async (parent, args: UpdateArgs, context) => {
       const { redis, token, logger } = context;
       const {
         group, category, name, owner, value,
       } = args;
+
       const settingsService = new SettingsService({ context });
 
+      // reset cache
       await redis.hdel(REDIS_HASHNAME, REDIS_FIELDNAME);
 
+      // get old settings if exist
       const [settingsField] = await settingsService.getSettings({
         limit: 1,
         where: [
@@ -67,27 +71,52 @@ const resolvers: IResolvers<any, Context> = {
 
       const tupleName = `${group}->${category}->${name}->owner:${owner || 'none'}`;
 
+      // create settings if not exists
       if (!settingsField) {
-        throw new ServerError(
-          `Settings field with ${tupleName} not found`,
-        );
-      }
+        try {
+          const newSettingsField = {
+            id: uuidv4(),
+            group,
+            category,
+            name,
+            owner: owner || null,
+            value,
+          };
+          await settingsService.createSettings(newSettingsField);
 
-      try {
-        await settingsService.updateSettings(settingsField.id, { value });
-      } catch (err) {
-        throw new ServerError(`Failed to update settings with id ${settingsField.id}`, { err });
-      }
+          if (newSettingsField.owner) {
+            logger.settings.info(`Account ${token.uuid} created new personal settings ${tupleName} to set «${JSON.stringify(value)}»`, { settingsID: newSettingsField.id });
+          } else {
+            logger.settings.info(`Account ${token.uuid} created new global settings ${tupleName} to set ${JSON.stringify(value)}`, { settingsID: newSettingsField.id });
+          }
 
+          // reload settings field
+          const [createdSettingsField] = await settingsService.getSettingsByIds([
+            newSettingsField.id,
+          ]);
 
-      if (settingsField.owner) {
-        logger.settings.info(`Account ${token.uuid} updated personal settings ${tupleName} to set «${JSON.stringify(value)}»`, { settingsID: settingsField.id });
+          // resolve
+          return createdSettingsField;
+        } catch (err) {
+          throw new ServerError('Failed to create settings', { err });
+        }
       } else {
-        logger.settings.info(`Account ${token.uuid} updated global settings ${tupleName} to set ${JSON.stringify(value)}`, { settingsID: settingsField.id });
-      }
+        // update settings
+        try {
+          await settingsService.updateSettings(settingsField.id, { value });
 
-      const [newSettingsField] = await settingsService.getSettingsByIds([settingsField.id]);
-      return newSettingsField;
+          if (settingsField.owner) {
+            logger.settings.info(`Account ${token.uuid} updated personal settings ${tupleName} to set «${JSON.stringify(value)}»`, { settingsID: settingsField.id });
+          } else {
+            logger.settings.info(`Account ${token.uuid} updated global settings ${tupleName} to set ${JSON.stringify(value)}`, { settingsID: settingsField.id });
+          }
+
+          const [newSettingsField] = await settingsService.getSettingsByIds([settingsField.id]);
+          return newSettingsField;
+        } catch (err) {
+          throw new ServerError(`Failed to update settings with id ${settingsField.id}`, { err });
+        }
+      }
     },
     // delete: async (parent, args: DeleteArgs, context) => {
     //   const { id } = args;
