@@ -44,7 +44,7 @@ type SettingsMutation {
     """
     If this property was set then settings will be updated only for this owner ID
     """
-    owner: String
+    owner: ID
     ): SettingsValue!
 }
 
@@ -99,7 +99,7 @@ type SettingsValue {
   """
   The presence of this parameter determines whether the parameter is shared by all or personal to this owner
   """
-  owner: String
+  owner: ID
 
   """
   Settings group name
