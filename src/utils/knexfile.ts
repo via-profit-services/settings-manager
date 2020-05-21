@@ -1,5 +1,5 @@
 /* eslint-disable import/no-extraneous-dependencies */
-import { Config } from 'knex';
+import 'graphql-import-node';
 import { configureApp } from './configureApp';
 
 const { database } = configureApp();
@@ -8,7 +8,7 @@ const { timezone, ...dbConfig } = database;
 const CHARSET = 'UTF8';
 const CLIENT = 'pg';
 
-const config: Config = {
+const config = {
   client: CLIENT,
   ...dbConfig,
   pool: {

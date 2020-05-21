@@ -43,9 +43,6 @@ const config = configureApp({
     settingsManager.typeDefs,
     settingsParams.typeDefs,
   ],
-  permissions: [
-    settingsManager.permissions,
-  ],
   resolvers: [
     settingsManager.resolvers,
     settingsParams.resolvers,

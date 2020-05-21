@@ -16,7 +16,7 @@
 ### Установка
 
 ```bash
-yarn add ssh://git@gitlab.com:via-profit-services/settings-manager.git#semver:^0.3.0
+yarn add ssh://git@gitlab.com:via-profit-services/settings-manager.git#semver:^0.4.0
 ```
 
 
@@ -103,7 +103,6 @@ layout->ui->theme
  - typeDefs - служебные Типы
  - resolvers - Служеюные Резолверы
  - service - Класс, реализующий модель данного модуля
- - permissions - Разрешения для [GraphQL-chield](https://github.com/maticzav/graphql-shield)
  - makeSchema - Генератор типов и резолверов для пользовательскиъ настроек
  - TSettingsCategory - ENUM Интерфейс категорий настроек
 
