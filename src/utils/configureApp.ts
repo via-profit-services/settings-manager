@@ -85,19 +85,17 @@ const serverConfig: IInitProps = {
 };
 
 const configureApp = (props?: IProps): IInitProps => {
-  const { typeDefs, resolvers, permissions } = props || {};
+  const { typeDefs, resolvers } = props || {};
   return {
     ...serverConfig,
     typeDefs,
     resolvers,
-    permissions,
   };
 };
 
 interface IProps {
   typeDefs: IInitProps['typeDefs'];
   resolvers: IInitProps['resolvers'];
-  permissions: IInitProps['permissions'];
 }
 
 export default configureApp;
