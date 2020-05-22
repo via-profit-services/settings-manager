@@ -2,7 +2,7 @@
     "name": "@via-profit-services/settings-manager",
     "private": true,
     "support": "https://via-profit.ru",
-    "version": "0.4.0",
+    "version": "0.4.1",
     "description": "Via Profit Settings Manager Schema",
     "main": "dist/index.js",
     "scripts": {
