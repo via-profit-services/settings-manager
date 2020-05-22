@@ -50,7 +50,7 @@ const resolvers: IResolvers<any, Context> = {
     set: async (parent, args: UpdateArgs, context) => {
       const { redis, token, logger } = context;
       const {
-        group, category, name, owner, value,
+        id, group, category, name, owner, value,
       } = args;
 
       const settingsService = new SettingsService({ context });
@@ -75,7 +75,7 @@ const resolvers: IResolvers<any, Context> = {
       if (!settingsField) {
         try {
           const newSettingsField = {
-            id: uuidv4(),
+            id: id || uuidv4(),
             group,
             category,
             name,
@@ -153,6 +153,7 @@ interface UpdateArgs {
   category: TSettingsCategory;
   name: string;
   value: any;
+  id?: string;
   owner?: string;
 }
 interface DeleteArgs {

@@ -22,6 +22,10 @@ type SettingsMutation {
   """
   set(
     """
+    You may provide custom ID of this record
+    """
+    id: ID
+    """
     Settings geoup name
     """
     group: String!
