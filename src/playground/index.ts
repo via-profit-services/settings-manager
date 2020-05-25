@@ -36,6 +36,12 @@ const settingsParams = makeSchema({
       name: ['companyDisplayName'],
     },
   ],
+  customers: [
+    {
+      category: TSettingsCategory.other,
+      name: ['filterPresets'],
+    },
+  ],
 });
 
 const config = configureApp({

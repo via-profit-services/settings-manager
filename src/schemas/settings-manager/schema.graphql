@@ -50,6 +50,8 @@ type SettingsMutation {
     """
     owner: ID
     ): SettingsValue!
+
+  delete(id: ID!): Boolean!
 }
 
 """

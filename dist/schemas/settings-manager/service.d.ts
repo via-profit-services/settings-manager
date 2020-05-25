@@ -1,8 +1,6 @@
 import { TOutputFilter } from '@via-profit-services/core';
 import { Context } from '../../context';
 import { TSettingsCategory } from './types';
-export declare const REDIS_HASHNAME = "viaprofitservices";
-export declare const REDIS_FIELDNAME = "settings";
 interface IProps {
     context: Context;
 }

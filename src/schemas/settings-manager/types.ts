@@ -1,3 +1,5 @@
+import { IContext, ILoggerCollection } from '@via-profit-services/core';
+import { Logger } from 'winston';
 
 export enum TSettingsCategory {
   general = 'general',
@@ -24,3 +26,30 @@ export interface MakeSchemaParams {
     owner?: string;
   }>;
 }
+
+
+export type Context = Pick<IContext, 'knex' | 'timezone' | 'token'> & {
+  logger: ILoggerCollection & {
+    settings: Logger;
+  };
+}
+
+
+export interface ISettingsNode {
+  createdAt: Date;
+  updatedAt: Date;
+  id: string;
+  owner: string;
+  group: string;
+  name: string;
+  value: any;
+  category: TSettingsCategory;
+}
+
+export type ISettingsParsed = Pick<ISettingsNode, 'owner' | 'group' | 'name' | 'category'>;
+
+export type TSettingsTable = ISettingsNode;
+export type TSettingsTableInput = Omit<ISettingsNode, 'createdAt' | 'updatedAt'> & {
+  createdAt: string;
+  updatedAt: string;
+};
