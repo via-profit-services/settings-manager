@@ -2,24 +2,15 @@ import { TWhereAction, ServerError } from '@via-profit-services/core';
 import { IResolvers } from 'graphql-tools';
 import { v4 as uuidv4 } from 'uuid';
 
-import { Context } from '../../../context';
-import SettingsService, { REDIS_FIELDNAME, REDIS_HASHNAME, ISettingsNode } from '../service';
-import { TSettingsCategory } from '../types';
+import createLoaders from '../loaders';
+import SettingsService from '../service';
+import {
+  TSettingsCategory, Context, ISettingsNode, ISettingsParsed,
+} from '../types';
 
 const resolvers: IResolvers<any, Context> = {
   Query: {
-    settings: async (parent, args, context) => {
-      const { redis } = context;
-      const cache = await redis.hget(REDIS_HASHNAME, REDIS_FIELDNAME);
-
-      // preload all settings
-      if (cache === null) {
-        const settingsService = new SettingsService({ context });
-        const allSettings = await settingsService.getSettings({ limit: 1000 });
-        await redis.hset(REDIS_HASHNAME, REDIS_FIELDNAME, JSON.stringify(allSettings));
-      }
-      return args;
-    },
+    settings: async (parent, args) => args,
   },
   Mutation: {
     settings: () => ({}),
@@ -42,21 +33,38 @@ const resolvers: IResolvers<any, Context> = {
     group: () => ({}),
     category: () => ({}),
   }, {
-    get: (target, prop: keyof ISettingsNode) => (parent: ISettingsNode) => {
-      return parent[prop] || null;
+    get: (target, prop: keyof ISettingsNode) => async (
+      parent: ISettingsNode,
+      args: any,
+      context: Context) => {
+      const pseudoId = SettingsService.DataToPseudoId(parent);
+      const loaders = createLoaders(context);
+      const settingsData = await loaders.settings.load(pseudoId);
+
+      if (typeof settingsData === 'undefined') {
+        return null;
+      }
+
+      if (typeof settingsData[prop] === 'undefined') {
+        return null;
+      }
+
+      return settingsData[prop];
     },
   }),
   SettingsMutation: {
     set: async (parent, args: UpdateArgs, context) => {
-      const { redis, token, logger } = context;
+      const { token, logger } = context;
       const {
         id, group, category, name, owner, value,
       } = args;
 
+      const pseudoId = SettingsService.DataToPseudoId(args as ISettingsParsed);
+      const loaders = createLoaders(context);
+      loaders.settings.clear(pseudoId);
+
       const settingsService = new SettingsService({ context });
 
-      // reset cache
-      await redis.hdel(REDIS_HASHNAME, REDIS_FIELDNAME);
 
       // get old settings if exist
       const [settingsField] = await settingsService.getSettings({
@@ -90,13 +98,7 @@ const resolvers: IResolvers<any, Context> = {
             logger.settings.info(`Account ${token.uuid} created new global settings ${tupleName} to set ${JSON.stringify(value)}`, { settingsID: newSettingsField.id });
           }
 
-          // reload settings field
-          const [createdSettingsField] = await settingsService.getSettingsByIds([
-            newSettingsField.id,
-          ]);
-
-          // resolve
-          return createdSettingsField;
+          return args;
         } catch (err) {
           throw new ServerError('Failed to create settings', { err });
         }
@@ -118,32 +120,33 @@ const resolvers: IResolvers<any, Context> = {
         }
       }
     },
-    // delete: async (parent, args: DeleteArgs, context) => {
-    //   const { id } = args;
-    //   const { redis, token, logger } = context;
-    //   const settingsService = new SettingsService({ context });
+    delete: async (parent, args: DeleteArgs, context) => {
+      const { id } = args;
+      const { token, logger } = context;
+      const settingsService = new SettingsService({ context });
 
-    //   await redis.hdel(REDIS_HASHNAME, REDIS_FIELDNAME);
+      const [settingsField] = await settingsService.getSettingsByIds([id]);
+      const tupleName = `${settingsField.group}->${settingsField.category}->${settingsField.name}->owner:${settingsField.owner || 'none'}`;
+      const loaders = createLoaders(context);
+      const pseudoId = SettingsService.DataToPseudoId(settingsField as ISettingsParsed);
+      loaders.settings.clear(pseudoId);
 
-    //   const [settingsField] = await settingsService.getSettingsByIds([id]);
-    //   const tupleName =
-    // `${settingsField.group}->
-    // ${settingsField.category}->${settingsField.name}->owner:${settingsField.owner || 'none'}`;
+      try {
+        await settingsService.deleteSettings(id);
+      } catch (err) {
+        throw new ServerError(`Failed to delete settings ${tupleName} with id ${id}`, { err });
+      }
 
-    //   try {
-    //     await settingsService.deleteSettings(id);
-    //   } catch (err) {
-    //     throw new ServerError(`Failed to delete settings ${tupleName} with id ${id}`, { err });
-    //   }
+      if (settingsField.owner) {
+        logger.settings.info(`Account ${token.uuid} deleted personal settings ${tupleName}`,
+          { settingsID: settingsField.id });
+      } else {
+        logger.settings.info(`Account ${token.uuid} deleted global settings ${tupleName}`,
+          { settingsID: settingsField.id });
+      }
 
-    //   if (settingsField.owner) {
-    //     logger.settings.info(`Account ${token.uuid} deleted personal settings ${tupleName}`,
-    // { settingsID: settingsField.id });
-    //   } else {
-    //     logger.settings.info(`Account ${token.uuid} deleted global settings ${tupleName}`,
-    // { settingsID: settingsField.id });
-    //   }
-    // },
+      return true;
+    },
   },
 };
 

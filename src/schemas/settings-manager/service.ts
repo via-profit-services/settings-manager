@@ -6,33 +6,17 @@ import {
 
 import moment from 'moment-timezone';
 
-import { Context } from '../../context';
-import { TSettingsCategory } from './types';
-
-export const REDIS_HASHNAME = 'viaprofitservices';
-export const REDIS_FIELDNAME = 'settings';
-
+import {
+  ISettingsNode,
+  ISettingsParsed,
+  TSettingsTable,
+  TSettingsTableInput,
+  Context,
+} from './types';
 
 interface IProps {
   context: Context;
 }
-
-export interface ISettingsNode {
-  createdAt: Date;
-  updatedAt: Date;
-  id: string;
-  owner: string;
-  group: string;
-  name: string;
-  value: any;
-  category: TSettingsCategory;
-}
-
-type TSettingsTable = ISettingsNode;
-type TSettingsTableInput = Omit<ISettingsNode, 'createdAt' | 'updatedAt'> & {
-  createdAt: string;
-  updatedAt: string;
-};
 
 
 class SettingsService {
@@ -79,6 +63,64 @@ class SettingsService {
     });
 
     return nodes;
+  }
+
+  public static DataToPseudoId(data: ISettingsParsed) {
+    const {
+      group, category, name, owner,
+    } = data;
+    return [
+      group,
+      category,
+      name,
+      owner,
+    ].join('|');
+  }
+
+  public static getDataFromPseudoId(pseudoId: string): ISettingsParsed {
+    const [
+      group,
+      category,
+      name,
+      owner,
+    ] = pseudoId.split('|') as string[];
+
+    return {
+      group,
+      category,
+      name,
+      owner,
+    } as ISettingsParsed;
+  }
+
+  public async getSettingsByPseudoIds(pseudoIds: string[]): Promise<ISettingsNode[]> {
+    const { knex } = this.props.context;
+    const settingsList = await knex
+      .select(['*'])
+      .from<any, TSettingsTable[]>('settings')
+      .limit(1000)
+      .where((builder) => {
+        pseudoIds.forEach((pseudoId) => {
+          const data = SettingsService.getDataFromPseudoId(pseudoId);
+          builder.orWhere((orBuilder) => {
+            orBuilder.where('category', TWhereAction.EQ, data.category);
+            orBuilder.where('group', TWhereAction.EQ, data.group);
+            orBuilder.where('name', TWhereAction.EQ, data.name);
+
+            orBuilder.andWhere((andBuilder) => {
+              if (data.owner) {
+                andBuilder.where('owner', TWhereAction.EQ, data.owner).orWhereNull('owner');
+              } else {
+                andBuilder.whereNull('owner');
+              }
+            });
+          });
+        });
+
+        return builder;
+      });
+
+    return settingsList;
   }
 
 

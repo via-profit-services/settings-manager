@@ -1,9 +1,4 @@
 /* eslint-disable import/prefer-default-export */
-import { ServerError } from '@via-profit-services/core';
-
-import { Context } from '../../context';
-import { REDIS_FIELDNAME, REDIS_HASHNAME, ISettingsNode } from './service';
-
 import { MakeSchemaParams } from './types';
 
 interface TSource {
@@ -107,7 +102,12 @@ export const makeSchema = (params: MakeSchemaParams) => {
 
     // define settings collection
     resolvers.SettingsCollection = resolvers.SettingsCollection || {};
-    resolvers.SettingsCollection[group] = (parent: TSource) => parent;
+    resolvers.SettingsCollection[group] = (parent: TSource) => {
+      return {
+        ...parent,
+        group,
+      };
+    };
 
     // define group
     resolvers[`Settings${capitalizeGroup}Group`] = {};
@@ -116,51 +116,23 @@ export const makeSchema = (params: MakeSchemaParams) => {
 
       // append category into the group
       resolvers[`Settings${capitalizeGroup}Group`][category] = async (parent: TSource) => {
-        return parent;
+        return {
+          ...parent,
+          category,
+        };
       };
 
       const obj: any = {};
       namesOfThisTSettingsCategory.forEach(({ name }) => {
         const names = Array.isArray(name) ? name : [name];
         names.forEach((mname) => {
-          obj[mname] = async (parent: any, args: any, context: Context) => {
+          obj[mname] = async (parent: any) => {
             const { owner } = parent;
-            const { redis } = context;
-
-            const cache = await redis.hget(REDIS_HASHNAME, REDIS_FIELDNAME);
-            let settingsList: ISettingsNode[] = [];
-
-            try {
-              settingsList = JSON.parse(cache) as ISettingsNode[];
-            } catch (err) {
-              throw new ServerError('Failed to read settings', { err });
-            }
-
-            try {
-              const [filteredListOfDefaults] = settingsList.filter((settingsField) => {
-                return (
-                  settingsField.group === group
-                  && settingsField.category === category
-                  && settingsField.name === mname
-                  && settingsField.owner === null
-                );
-              });
-
-              const [filteredList] = settingsList.filter((settingsField) => {
-                return (
-                  settingsField.group === group
-                && settingsField.category === category
-                && settingsField.name === mname
-                && settingsField.owner === (owner || null)
-                );
-              });
-
-              return (filteredList || filteredListOfDefaults) || null;
-            } catch (err) {
-              throw new ServerError(
-                `Failed to get settings for current query «${group}»->${category}»->«${mname}»->«${owner || 'without owner'}»`, { err },
-              );
-            }
+            return {
+              ...parent,
+              owner,
+              name: mname,
+            };
           };
         });
       });
