@@ -1,5 +1,3 @@
-/* eslint-disable class-methods-use-this */
-// import { v4 as uuidv4 } from 'uuid';
 import {
   TOutputFilter, TWhereAction, convertWhereToKnex, convertOrderByToKnex, convertJsonToKnex,
 } from '@via-profit-services/core';
@@ -38,18 +36,24 @@ class SettingsService {
     } = filter;
 
 
-    if (search) {
-      where.push([search.field, TWhereAction.ILIKE, `%${search.query}%`]);
-    }
-
     const settingsList = await knex
-      .select([
-        '*',
-      ])
+      .select(['*'])
       .from<any, TSettingsTable[]>('settings')
       .limit(limit || 1)
       .offset(offset || 0)
       .where((builder) => convertWhereToKnex(builder, where))
+      .where((builder) => {
+        // This is a temporary solution until the «Search» module is implemented
+        if (search) {
+          search.forEach(({ field, query }) => {
+            query.split(' ').map((subquery) => {
+              // Note: Set type ::text forcibly
+              return builder.orWhereRaw(`"${field}"::text ${TWhereAction.ILIKE} '%${subquery}%'`);
+            });
+          });
+        }
+        return builder;
+      })
       .orderBy(convertOrderByToKnex(orderBy));
 
     return settingsList;

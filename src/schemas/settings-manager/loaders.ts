@@ -28,14 +28,17 @@ export default function createLoaders(context: Context) {
             category, group, name, owner,
           } = SettingsService.getDataFromPseudoId(pseudoId);
 
-          const settingsData = nodes.find((node) => {
+          const settingsList = nodes.filter((node) => {
             return node.category === category
               && node.group === group
-              && node.name === name
-              && (node.owner === (owner || null));
+              && node.name === name;
           });
 
-          return settingsData;
+          // try to search settings for specified owner
+          const settings = settingsList.find((s) => s.owner === owner);
+
+          // return founded settings or default settings
+          return settings || settingsList[0];
         });
       });
   });

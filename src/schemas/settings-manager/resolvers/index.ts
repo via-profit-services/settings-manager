@@ -1,4 +1,4 @@
-import { TWhereAction, ServerError } from '@via-profit-services/core';
+import { TWhereAction, ServerError, BadRequestError } from '@via-profit-services/core';
 import { IResolvers } from 'graphql-tools';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -42,7 +42,10 @@ const resolvers: IResolvers<any, Context> = {
       const settingsData = await loaders.settings.load(pseudoId);
 
       if (typeof settingsData === 'undefined') {
-        return null;
+        const { logger } = context;
+
+        logger.settings.error(`Attempt to get a nonexistent field with pseudoId ${pseudoId}`, { parent });
+        throw new BadRequestError('Settings of this params not exists', { parent });
       }
 
       if (typeof settingsData[prop] === 'undefined') {

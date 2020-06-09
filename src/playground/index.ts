@@ -13,7 +13,7 @@ const settingsParams = makeSchema({
   layout: [
     {
       category: TSettingsCategory.ui,
-      name: ['theme', 'menu'],
+      name: ['theme', 'menu', 'fontSize'],
     },
     {
       category: TSettingsCategory.ui,
