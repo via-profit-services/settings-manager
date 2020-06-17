@@ -1,7 +1,7 @@
 extend type Query {
 
   """
-  Returns any setting
+  Returns settings
   """
   settings(
     """
@@ -26,7 +26,7 @@ type SettingsMutation {
     """
     id: ID
     """
-    Settings geoup name
+    Settings group name
     """
     group: String!
 
