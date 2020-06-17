@@ -10,6 +10,7 @@ declare class SettingsService {
     getSettingsByIds(ids: string[]): Promise<ISettingsNode[]>;
     static DataToPseudoId(data: ISettingsParsed): string;
     static getDataFromPseudoId(pseudoId: string): ISettingsParsed;
+    getSettingsByPseudoId(pseudoId: string): Promise<ISettingsNode | false>;
     getSettingsByPseudoIds(pseudoIds: string[]): Promise<ISettingsNode[]>;
     updateSettings(id: string, settingsField: Partial<ISettingsNode>): Promise<string>;
     createSettings(settingsField: Omit<ISettingsNode, 'createdAt' | 'updatedAt'>): Promise<string>;
