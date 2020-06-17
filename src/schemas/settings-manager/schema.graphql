@@ -26,7 +26,7 @@ type SettingsMutation {
     """
     id: ID
     """
-    Settings geoup name
+    Settings group name
     """
     group: String!
 
