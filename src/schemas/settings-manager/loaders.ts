@@ -1,6 +1,7 @@
 import {
   Node, DataLoader,
 } from '@via-profit-services/core';
+import { v4 as uuidv4 } from 'uuid';
 
 import SettingsService from './service';
 import { ISettingsNode, Context } from './types';
@@ -20,27 +21,40 @@ export default function createLoaders(context: Context) {
 
   const service = new SettingsService({ context });
 
-  loaders.settings = new DataLoader<string, Node<ISettingsNode>>((pseudoIds: string[]) => {
-    return service.getSettingsByPseudoIds(pseudoIds)
-      .then((nodes) => {
-        return pseudoIds.map((pseudoId) => {
-          const {
-            category, group, name, owner,
-          } = SettingsService.getDataFromPseudoId(pseudoId);
+  loaders.settings = new DataLoader<string, Node<ISettingsNode>>(async (pseudoIds: string[]) => {
+    const nodes = await service.getSettingsByPseudoIds(pseudoIds);
 
-          const settingsList = nodes.filter((node) => {
-            return node.category === category
-              && node.group === group
-              && node.name === name;
-          });
+    const batchSettings = pseudoIds.map((pseudoId) => {
+      const {
+        category, group, name, owner,
+      } = SettingsService.getDataFromPseudoId(pseudoId);
 
-          // try to search settings for specified owner
-          const settings = settingsList.find((s) => s.owner === owner);
-
-          // return founded settings or default settings
-          return settings || settingsList[0];
-        });
+      const settingsList = nodes.filter((node) => {
+        return node.category === category
+          && node.group === group
+          && node.name === name;
       });
+
+      // try to search settings for specified owner
+      const settings = settingsList.find((s) => s.owner === owner);
+
+      if (!settings) {
+        const newSettings = {
+          ...settingsList[0],
+          owner,
+          comment: '',
+          id: uuidv4(),
+        };
+
+        service.createSettings(newSettings);
+        return newSettings;
+      }
+
+
+      return settings;
+    });
+
+    return batchSettings;
   });
 
   return loaders;
