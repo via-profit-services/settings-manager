@@ -15,32 +15,6 @@ const settingsParams = makeSchema({
       category: TSettingsCategory.ui,
       name: ['theme', 'menu', 'fontSize'],
     },
-    {
-      category: TSettingsCategory.ui,
-      name: ['color'],
-    },
-  ],
-  accounts: [
-    {
-      category: TSettingsCategory.constraint,
-      name: ['maxSessions'],
-    },
-  ],
-  main: [
-    {
-      category: TSettingsCategory.contact,
-      name: ['adminEmail'],
-    },
-    {
-      category: TSettingsCategory.label,
-      name: ['companyDisplayName'],
-    },
-  ],
-  customers: [
-    {
-      category: TSettingsCategory.other,
-      name: ['filterPresets'],
-    },
   ],
 });
 
