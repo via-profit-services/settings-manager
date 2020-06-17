@@ -22,11 +22,7 @@ type SettingsMutation {
   """
   set(
     """
-    You may provide custom ID of this record
-    """
-    id: ID
-    """
-    Settings geoup name
+    Settings group name
     """
     group: String!
 
@@ -51,7 +47,22 @@ type SettingsMutation {
     owner: ID
     ): SettingsValue!
 
-  delete(id: ID!): Boolean!
+  delete(
+    """
+    Settings group name
+    """
+    group: String!
+
+    """
+    Settings category
+    """
+    category: SettingsCategory!
+
+    """
+    Settings field name
+    """
+    name: String!
+  ): Boolean!
 }
 
 """

@@ -25,7 +25,6 @@ const resolvers: IResolvers<any, Context> = {
     developer: () => 'Via Profit',
   },
   SettingsValue: new Proxy({
-    id: () => ({}),
     value: () => ({}),
     createdAt: () => ({}),
     updatedAt: () => ({}),
@@ -59,7 +58,7 @@ const resolvers: IResolvers<any, Context> = {
     set: async (parent, args: UpdateArgs, context) => {
       const { token, logger } = context;
       const {
-        id, group, category, name, owner, value,
+        group, category, name, owner, value,
       } = args;
 
       const pseudoId = SettingsService.DataToPseudoId(args as ISettingsParsed);
@@ -86,7 +85,7 @@ const resolvers: IResolvers<any, Context> = {
       if (!settingsField) {
         try {
           const newSettingsField = {
-            id: id || uuidv4(),
+            id: uuidv4(),
             group,
             category,
             name,
@@ -124,28 +123,40 @@ const resolvers: IResolvers<any, Context> = {
       }
     },
     delete: async (parent, args: DeleteArgs, context) => {
-      const { id } = args;
+      const {
+        category, group, owner, name,
+      } = args;
       const { token, logger } = context;
       const settingsService = new SettingsService({ context });
-
-      const [settingsField] = await settingsService.getSettingsByIds([id]);
-      const tupleName = `${settingsField.group}->${settingsField.category}->${settingsField.name}->owner:${settingsField.owner || 'none'}`;
+      const tupleName = `${group}->${category}->${name}->owner:${owner || 'none'}`;
       const loaders = createLoaders(context);
-      const pseudoId = SettingsService.DataToPseudoId(settingsField as ISettingsParsed);
+      const pseudoId = SettingsService.DataToPseudoId({
+        category, group, owner, name,
+      });
+
+
+      const settingsData = await settingsService.getSettingsByPseudoId(pseudoId);
+      if (!settingsData) {
+        throw new ServerError(`Settings with tuple ${tupleName} not found`);
+      }
+
       loaders.settings.clear(pseudoId);
 
       try {
-        await settingsService.deleteSettings(id);
+        await settingsService.deleteSettings(settingsData.id);
       } catch (err) {
-        throw new ServerError(`Failed to delete settings ${tupleName} with id ${id}`, { err });
+        throw new ServerError(
+          `Failed to delete settings ${tupleName} with id ${settingsData.id}`,
+          { err },
+        );
       }
 
-      if (settingsField.owner) {
+      if (settingsData.owner) {
         logger.settings.info(`Account ${token.uuid} deleted personal settings ${tupleName}`,
-          { settingsID: settingsField.id });
+          { settingsID: settingsData.id });
       } else {
         logger.settings.info(`Account ${token.uuid} deleted global settings ${tupleName}`,
-          { settingsID: settingsField.id });
+          { settingsID: settingsData.id });
       }
 
       return true;
@@ -159,11 +170,13 @@ interface UpdateArgs {
   category: TSettingsCategory;
   name: string;
   value: any;
-  id?: string;
   owner?: string;
 }
 interface DeleteArgs {
-  id: string;
+  group: string;
+  category: TSettingsCategory;
+  name: string;
+  owner: string;
 }
 
 export default resolvers;

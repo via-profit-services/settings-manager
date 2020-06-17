@@ -97,6 +97,11 @@ class SettingsService {
     } as ISettingsParsed;
   }
 
+  public async getSettingsByPseudoId(pseudoId: string): Promise<ISettingsNode | false> {
+    const settings = await this.getSettingsByPseudoIds([pseudoId]);
+    return settings.length ? settings[0] : false;
+  }
+
   public async getSettingsByPseudoIds(pseudoIds: string[]): Promise<ISettingsNode[]> {
     const { knex } = this.props.context;
     const settingsList = await knex
