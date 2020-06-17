@@ -26,55 +26,27 @@ interface SettingsField {
 export async function seed(knex: Knex): Promise<any> {
   return knex('settings').del()
     .then(() => {
-      const owner = uuidv4();
       const settings: SettingsField[] = [
-        {
-          owner,
-          group: 'layout',
-          category: Category.ui,
-          name: 'theme',
-          value: 'dark',
-          comment: 'Theme name for specified account',
-        },
-        {
-          owner,
-          group: 'layout',
-          category: Category.ui,
-          name: 'menu',
-          value: false,
-          comment: 'Display Main Menu for specified account',
-        },
         {
           group: 'layout',
           category: Category.ui,
           name: 'theme',
           value: 'light',
-          comment: 'Default Theme name for all accounts',
+          comment: 'Theme name for specified account',
         },
         {
           group: 'layout',
           category: Category.ui,
           name: 'menu',
-          value: false,
-          comment: 'Default state of Display Main Menu for all accounts',
+          value: true,
+          comment: 'Display Main Menu for specified account',
         },
         {
-          group: 'accounts',
-          category: Category.constraint,
-          name: 'maxSessions',
-          value: false,
-        },
-        {
-          group: 'main',
-          category: Category.contact,
-          name: 'adminEmail',
-          value: 'promo@via-profit.ru',
-        },
-        {
-          group: 'main',
-          category: Category.label,
-          name: 'companyDisplayName',
-          value: 'Via Profit',
+          group: 'layout',
+          category: Category.ui,
+          name: 'fontSize',
+          value: 12,
+          comment: 'Interface font size',
         },
       ];
 
