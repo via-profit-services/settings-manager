@@ -1,5 +1,4 @@
 /* eslint-disable import/no-extraneous-dependencies */
-import fs from 'fs';
 import path from 'path';
 import { IInitProps, configureLogger } from '@via-profit-services/core';
 import dotenv from 'dotenv';
@@ -74,14 +73,6 @@ const serverConfig: IInitProps = {
   },
   jwt: jwtConfig,
   logger,
-  serverOptions: {
-    key: process.env.SSL_KEY
-      ? fs.readFileSync(path.resolve(rootPath, process.env.SSL_KEY))
-      : undefined,
-    cert: process.env.SSL_CERT
-      ? fs.readFileSync(path.resolve(rootPath, process.env.SSL_CERT))
-      : undefined,
-  },
 };
 
 const configureApp = (props?: IProps): IInitProps => {

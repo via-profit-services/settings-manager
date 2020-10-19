@@ -57,9 +57,7 @@ app.bootstrap((props) => {
   console.log('');
   console.log(`${chalk.green('GraphQL server')}:     ${chalk.yellow(resolveUrl.graphql)}`);
 
-  if (resolveUrl.playground) {
-    console.log(`${chalk.magenta('GraphQL playground')}: ${chalk.yellow(resolveUrl.playground)}`);
-  }
+
   if (resolveUrl.voyager) {
     console.log(`${chalk.magenta('GraphQL voyager')}:    ${chalk.yellow(resolveUrl.voyager)}`);
   }
