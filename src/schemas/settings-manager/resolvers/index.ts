@@ -1,5 +1,6 @@
-import { TWhereAction, ServerError, BadRequestError } from '@via-profit-services/core';
-import { IResolvers } from 'graphql-tools';
+import {
+  TWhereAction, ServerError, BadRequestError, IResolvers,
+} from '@via-profit-services/core';
 import { v4 as uuidv4 } from 'uuid';
 
 import createLoaders from '../loaders';

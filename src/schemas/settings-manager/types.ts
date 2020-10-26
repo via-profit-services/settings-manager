@@ -1,5 +1,4 @@
-import { IContext, ILoggerCollection } from '@via-profit-services/core';
-import { Logger } from 'winston';
+import { IContext, ILoggerCollection, Winston } from '@via-profit-services/core';
 
 export enum TSettingsCategory {
   general = 'general',
@@ -30,7 +29,7 @@ export interface MakeSchemaParams {
 
 export type Context = Pick<IContext, 'knex' | 'timezone' | 'token'> & {
   logger: ILoggerCollection & {
-    settings: Logger;
+    settings: Winston.Logger;
   };
 }
 
