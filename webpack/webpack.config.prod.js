@@ -24,7 +24,7 @@ module.exports = merge(baseConfig, {
       banner: `
  Via Profit Services / Settings Manager
 
- Repository https://gitlab.com/via-profit-services/settings-manager
+ Repository https://github.com/via-profit-services/settings-manager
  Contact    promo@via-profit.ru
  Website    https://via-profit.ru
       `,

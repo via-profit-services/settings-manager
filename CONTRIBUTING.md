@@ -90,7 +90,7 @@ psql --host=localhost --username=services --dbname=services_settings_manager --p
 Склонируйте репозиторий
 
 ```bash
-git clone git@gitlab.com:via-profit-services/settings-manager.git
+git clone git@github.com:via-profit-services/settings-manager.git
 ```
 
 **Замечание:** _(Необязательно)_ Чтобы запустить localhost на SSL используйте [mkcert](https://github.com/FiloSottile/mkcert) 
