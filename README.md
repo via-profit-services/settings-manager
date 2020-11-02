@@ -15,11 +15,11 @@
 ### Установка
 
 ```bash
-yarn add ssh://git@gitlab.com:via-profit-services/settings-manager.git#semver:^0.7.2
+yarn add ssh://git@github.com:via-profit-services/settings-manager.git#semver:^0.7.2
 ```
 
 
-Список версий [см. здесь](https://gitlab.com/via-profit-services/settings-manager/-/tags)
+Список версий [см. здесь](https://github.com/via-profit-services/settings-manager/-/tags)
 
 
 ### Миграции
