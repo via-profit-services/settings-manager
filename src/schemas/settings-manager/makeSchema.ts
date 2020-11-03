@@ -102,12 +102,10 @@ export const makeSchema = (params: MakeSchemaParams) => {
 
     // define settings collection
     resolvers.SettingsCollection = resolvers.SettingsCollection || {};
-    resolvers.SettingsCollection[group] = (parent: TSource) => {
-      return {
+    resolvers.SettingsCollection[group] = (parent: TSource) => ({
         ...parent,
         group,
-      };
-    };
+      });
 
     // define group
     resolvers[`Settings${capitalizeGroup}Group`] = {};
@@ -115,12 +113,10 @@ export const makeSchema = (params: MakeSchemaParams) => {
       const namesOfThisTSettingsCategory = dataArray.filter((d) => d.category === category);
 
       // append category into the group
-      resolvers[`Settings${capitalizeGroup}Group`][category] = async (parent: TSource) => {
-        return {
+      resolvers[`Settings${capitalizeGroup}Group`][category] = async (parent: TSource) => ({
           ...parent,
           category,
-        };
-      };
+        });
 
       const obj: any = {};
       namesOfThisTSettingsCategory.forEach(({ name }) => {
@@ -128,6 +124,7 @@ export const makeSchema = (params: MakeSchemaParams) => {
         names.forEach((mname) => {
           obj[mname] = async (parent: any) => {
             const { owner } = parent;
+
             return {
               ...parent,
               owner,
@@ -141,6 +138,7 @@ export const makeSchema = (params: MakeSchemaParams) => {
       resolvers[`Settings${capitalizeGroup}${capitalizeTSettingsCategory}Fields`] = obj;
     });
   });
+
   // console.log('');
   // console.log(typeDefs.join('\n'));
   // console.log(resolvers);

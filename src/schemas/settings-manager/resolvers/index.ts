@@ -118,6 +118,7 @@ const resolvers: IResolvers<any, Context> = {
           }
 
           const [newSettingsField] = await settingsService.getSettingsByIds([settingsField.id]);
+
           return newSettingsField;
         } catch (err) {
           throw new ServerError(`Failed to update settings with id ${settingsField.id}`, { err });
