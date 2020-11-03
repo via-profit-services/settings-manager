@@ -46,12 +46,13 @@ class SettingsService {
         // This is a temporary solution until the «Search» module is implemented
         if (search) {
           search.forEach(({ field, query }) => {
-            query.split(' ').map((subquery) => {
+            query.split(' ').map((subquery) =>
               // Note: Set type ::text forcibly
-              return builder.orWhereRaw(`"${field}"::text ${TWhereAction.ILIKE} '%${subquery}%'`);
-            });
+               builder.orWhereRaw(`"${field}"::text ${TWhereAction.ILIKE} '%${subquery}%'`),
+            );
           });
         }
+
         return builder;
       })
       .orderBy(convertOrderByToKnex(orderBy));
@@ -73,6 +74,7 @@ class SettingsService {
     const {
       group, category, name, owner,
     } = data;
+
     return [
       group,
       category,

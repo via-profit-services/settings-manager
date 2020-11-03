@@ -29,11 +29,9 @@ export default function createLoaders(context: Context) {
         category, group, name, owner,
       } = SettingsService.getDataFromPseudoId(pseudoId);
 
-      const settingsList = nodes.filter((node) => {
-        return node.category === category
+      const settingsList = nodes.filter((node) => node.category === category
           && node.group === group
-          && node.name === name;
-      });
+          && node.name === name);
 
       // try to search settings for specified owner
       const settings = settingsList.find((s) => s.owner === owner);
@@ -47,6 +45,7 @@ export default function createLoaders(context: Context) {
         };
 
         service.createSettings(newSettings);
+
         return newSettings;
       }
 
