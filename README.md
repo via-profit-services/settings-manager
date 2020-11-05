@@ -10,16 +10,26 @@
 
 ## Содержание
 
+- [Зависимости](#dependencies)
 - [Установка и настройка](#setup)
 - [Как использовать](#how-to-use)
 - [Подключение](#integration)
 
+## <a name="dependencies"></a> Зависимости
+
+Модули, которые необходимо установить вручную
+
+ - [Core](https://github.com/via-profit-services/core)
+
+
 ## <a name="setup"></a> Установка и настройка
+
+Предполагается, что у вас уже установлен пакет [@via-profit-services/core](https://github.com/via-profit-services/core). Если нет, то перейдите на страницу проекта и установите модуль согласно документации.
 
 ### Установка
 
 ```bash
-yarn add@via-profit-services/settings-manager
+yarn add @via-profit-services/settings-manager
 ```
 
 ![npm (scoped)](https://img.shields.io/npm/v/@via-profit-services/settings-manager?color=blue)
@@ -31,7 +41,8 @@ yarn add@via-profit-services/settings-manager
 После первой установки примените все необходимые миграции:
 
 ```bash
-yarn knex:migrate:latest
+yarn via-profit-core get-migrations -m ./src/database/migrations
+yarn via-profit-core knex migrate latest --knexfile ./src/utils/knexfile.ts
 ```
 
 После применения миграций будут созданы все необходимые таблицы в вашей базе данных
