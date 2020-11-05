@@ -51,8 +51,6 @@ yarn via-profit-core knex migrate latest --knexfile ./src/utils/knexfile.ts
 ## <a name="how-to-use"></a> Как использовать
 
 
-
-
 Каждое поле настроек имеет следующую структуру:
  - **group** - `String` Группа настроек. Произвольная строка без пробелов и спецсимволов. Каждая группа должна быть уникальна
  - **category** - `TSettingsCategory` Категория настроек. Категория - это заранее заготовленный список значений, смысл которого структурировать список настроек
@@ -119,16 +117,18 @@ layout->ui->theme
  - service - Класс, реализующий модель данного модуля
  - makeSchema - Генератор типов и резолверов для пользовательскиъ настроек
  - TSettingsCategory - ENUM Интерфейс категорий настроек
+ - configureSettingsLogger - Функция конфигурации логгера
 
 
 
 Пример подключения:
 
 ```ts
+import path from 'path';
 import { App } from '@via-profit-services/core';
 import * as settingsManager from '@via-profit-services/settings-manager';
 
-const { TSettingsCategory, makeSchema,  } = settingsManager; 
+const { TSettingsCategory, makeSchema, configureSettingsLogger } = settingsManager; 
 
 // generate settings schema
 const customSettings = makeSchema({
@@ -150,8 +150,17 @@ const customSettings = makeSchema({
   ],
 });
 
+// define log directory location
+const logDir = path.resolve(__dirname, '../log');
+
 const app = new App({
   ...
+  logger: configureLogger({
+    logDir,
+    loggers: {
+      settings: configureSettingsLogger({ logDir }),
+    },
+  }),
   typeDefs: [
     settingsManager.typeDefs, // settings required types
     customSettings.typeDefs, // generated types
