@@ -11,7 +11,7 @@
     "keywords": [
         "graphql",
         "via-profit",
-        "files"
+        "settings"
     ],
     "scripts": {
         "dist": "yarn lint && yarn test && yarn build:dist",
