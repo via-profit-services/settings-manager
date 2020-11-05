@@ -28,7 +28,7 @@ export default function createLoaders(context: Context) {
       const {
         category, group, name, owner,
       } = SettingsService.getDataFromPseudoId(pseudoId);
-
+// console.log('batchSettings', { category, group, name, owner });
       const settingsList = nodes.filter((node) => node.category === category
           && node.group === group
           && node.name === name);
@@ -37,12 +37,22 @@ export default function createLoaders(context: Context) {
       const settings = settingsList.find((s) => s.owner === owner);
 
       if (!settings) {
-        const newSettings = {
+        const newSettings: ISettingsNode = {
+          category,
+          group,
+          value: null,
           ...settingsList[0],
           owner,
           comment: '',
           id: uuidv4(),
         };
+
+        if (!newSettings.category || newSettings.group) {
+          const { logger } = context;
+          logger.settings.error('Invalid settings was passed', { newSettings });
+
+          return newSettings;
+        }
 
         service.createSettings(newSettings);
 

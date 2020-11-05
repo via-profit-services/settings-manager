@@ -23,6 +23,7 @@ export interface MakeSchemaParams {
     name: string | string[];
 
     owner?: string;
+
   }>;
 }
 
@@ -41,8 +42,9 @@ export interface ISettingsNode {
   owner: string;
   group: string;
   name: string;
-  value: any;
+  value: any | null;
   category: TSettingsCategory;
+  comment: string;
 }
 
 export type ISettingsParsed = Pick<ISettingsNode, 'owner' | 'group' | 'name' | 'category'>;
