@@ -154,11 +154,14 @@ class SettingsService {
       knex, timezone,
     } = this.props.context;
 
+
     const data = {
       ...settingsField,
-      value: convertJsonToKnex(knex, settingsField.value),
       createdAt: moment.tz(timezone).format(),
       updatedAt: moment.tz(timezone).format(),
+      value: typeof settingsField.value === 'undefined'
+        ? null
+        : convertJsonToKnex(knex, settingsField.value),
     };
     const [affectedId]: string[] = await knex<Partial<TSettingsTableInput>>('settings')
       .insert(data)

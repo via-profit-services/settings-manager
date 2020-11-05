@@ -1,4 +1,6 @@
 /* eslint-disable import/prefer-default-export */
+import { IContext } from '@via-profit-services/core';
+
 import { MakeSchemaParams } from './types';
 
 interface TSource {
@@ -122,12 +124,13 @@ export const makeSchema = (params: MakeSchemaParams) => {
       namesOfThisTSettingsCategory.forEach(({ name }) => {
         const names = Array.isArray(name) ? name : [name];
         names.forEach((mname) => {
-          obj[mname] = async (parent: any) => {
+          obj[mname] = async (parent: any, args: any, context: IContext) => {
             const { owner } = parent;
+            const { token } = context;
 
             return {
               ...parent,
-              owner,
+              owner: owner || token.uuid,
               name: mname,
             };
           };
@@ -139,10 +142,6 @@ export const makeSchema = (params: MakeSchemaParams) => {
     });
   });
 
-  // console.log('');
-  // console.log(typeDefs.join('\n'));
-  // console.log(resolvers);
-  // console.log('');
   return {
     typeDefs: typeDefs.join('\n'),
     resolvers,

@@ -86,12 +86,13 @@ const resolvers: IResolvers<any, Context> = {
       // create settings if not exists
       if (!settingsField) {
         try {
-          const newSettingsField = {
+          const newSettingsField: Omit<ISettingsNode, 'createdAt' | 'updatedAt'> = {
             id: id || uuidv4(),
             group,
             category,
             name,
             owner: owner || null,
+            comment: '',
             value,
           };
           await settingsService.createSettings(newSettingsField);
