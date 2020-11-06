@@ -4,7 +4,7 @@ import {
 import { v4 as uuidv4 } from 'uuid';
 
 import SettingsService from './service';
-import { ISettingsNode, Context } from './types';
+import { ISettingsNode, Context, ExtendedContext } from './types';
 
 interface Loaders {
   settings: DataLoader<string, Node<ISettingsNode>>;
@@ -28,7 +28,7 @@ export default function createLoaders(context: Context) {
       const {
         category, group, name, owner,
       } = SettingsService.getDataFromPseudoId(pseudoId);
-// console.log('batchSettings', { category, group, name, owner });
+
       const settingsList = nodes.filter((node) => node.category === category
           && node.group === group
           && node.name === name);
@@ -48,7 +48,7 @@ export default function createLoaders(context: Context) {
         };
 
         if (!newSettings.category || newSettings.group) {
-          const { logger } = context;
+          const { logger } = context as ExtendedContext;
           logger.settings.error('Invalid settings was passed', { newSettings });
 
           return newSettings;
