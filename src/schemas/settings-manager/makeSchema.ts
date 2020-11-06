@@ -7,7 +7,7 @@ interface TSource {
   owner?: string;
 }
 
-export const makeSchema = (params: MakeSchemaParams) => {
+const makeSchema = (params: MakeSchemaParams) => {
   const typeDefs: string[] = [];
   const resolvers: any = {};
 
@@ -147,3 +147,5 @@ export const makeSchema = (params: MakeSchemaParams) => {
     resolvers,
   };
 };
+
+export default makeSchema;

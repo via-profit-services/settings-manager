@@ -23,7 +23,9 @@ class SettingsService {
   public constructor(props: IProps) {
     this.props = props;
   }
-
+/**
+* @deprecated Use DoOtherThing instead
+*/
   public async getSettings(filter: Partial<TOutputFilter>): Promise<ISettingsNode[]> {
     const { context } = this.props;
     const { knex } = context;
@@ -184,4 +186,3 @@ class SettingsService {
 }
 
 export default SettingsService;
-export { SettingsService };
