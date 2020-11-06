@@ -28,12 +28,12 @@ export interface MakeSchemaParams {
 }
 
 
-export type Context = Pick<IContext, 'knex' | 'timezone' | 'token'> & {
+export declare type Context = Pick<IContext, 'knex' | 'timezone' | 'token'>;
+export interface ExtendedContext extends Context {
   logger: ILoggerCollection & {
-    settings: Winston.Logger;
+      settings: Winston.Logger;
   };
 }
-
 
 export interface ISettingsNode {
   createdAt: Date;

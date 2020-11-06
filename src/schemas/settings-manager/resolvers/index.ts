@@ -6,7 +6,7 @@ import { v4 as uuidv4 } from 'uuid';
 import createLoaders from '../loaders';
 import SettingsService from '../service';
 import {
-  TSettingsCategory, Context, ISettingsNode, ISettingsParsed,
+  TSettingsCategory, Context, ISettingsNode, ISettingsParsed, ExtendedContext,
 } from '../types';
 
 const resolvers: IResolvers<any, Context> = {
@@ -38,12 +38,12 @@ const resolvers: IResolvers<any, Context> = {
       parent: ISettingsNode,
       args: any,
       context: Context) => {
-      const pseudoId = SettingsService.DataToPseudoId(parent);
+      const pseudoId = SettingsService.dataToPseudoId(parent);
       const loaders = createLoaders(context);
       const settingsData = await loaders.settings.load(pseudoId);
 
       if (typeof settingsData === 'undefined') {
-        const { logger } = context;
+        const { logger } = context as ExtendedContext;
 
         logger.settings.error(`Attempt to get a nonexistent field with pseudoId ${pseudoId}`, { parent });
         throw new BadRequestError('Settings of this params not exists', { parent });
@@ -58,12 +58,12 @@ const resolvers: IResolvers<any, Context> = {
   }),
   SettingsMutation: {
     set: async (parent, args: UpdateArgs, context) => {
-      const { token, logger } = context;
+      const { token, logger } = context as ExtendedContext;
       const {
         id, group, category, name, owner, value,
       } = args;
 
-      const pseudoId = SettingsService.DataToPseudoId(args as ISettingsParsed);
+      const pseudoId = SettingsService.dataToPseudoId(args as ISettingsParsed);
       const loaders = createLoaders(context);
       loaders.settings.clear(pseudoId);
 
@@ -128,13 +128,13 @@ const resolvers: IResolvers<any, Context> = {
     },
     delete: async (parent, args: DeleteArgs, context) => {
       const { id } = args;
-      const { token, logger } = context;
+      const { token, logger } = context as ExtendedContext;
       const settingsService = new SettingsService({ context });
 
       const [settingsField] = await settingsService.getSettingsByIds([id]);
       const tupleName = `${settingsField.group}->${settingsField.category}->${settingsField.name}->owner:${settingsField.owner || 'none'}`;
       const loaders = createLoaders(context);
-      const pseudoId = SettingsService.DataToPseudoId(settingsField as ISettingsParsed);
+      const pseudoId = SettingsService.dataToPseudoId(settingsField as ISettingsParsed);
       loaders.settings.clear(pseudoId);
 
       try {

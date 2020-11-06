@@ -160,7 +160,8 @@ export async function down(knex: Knex): Promise<any> {
 Модуль экспортирует наружу:
  - typeDefs - служебные Типы
  - resolvers - Служеюные Резолверы
- - service - Класс, реализующий модель данного модуля
+ - service `depricated` - Класс, реализующий модель данного модуля
+ - Settings - Класс, реализующий модель данного модуля
  - makeSchema - Генератор типов и резолверов для пользовательскиъ настроек
  - TSettingsCategory - ENUM Интерфейс категорий настроек
  - configureSettingsLogger - Функция конфигурации логгера

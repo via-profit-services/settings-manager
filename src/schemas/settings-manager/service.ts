@@ -23,7 +23,9 @@ class SettingsService {
   public constructor(props: IProps) {
     this.props = props;
   }
-
+/**
+* @deprecated Use DoOtherThing instead
+*/
   public async getSettings(filter: Partial<TOutputFilter>): Promise<ISettingsNode[]> {
     const { context } = this.props;
     const { knex } = context;
@@ -70,7 +72,23 @@ class SettingsService {
     return nodes;
   }
 
+  /**
+   * @deprecated Use `dataToPseudoId` method
+   */
   public static DataToPseudoId(data: ISettingsParsed) {
+    const {
+      group, category, name, owner,
+    } = data;
+
+    return [
+      group,
+      category,
+      name,
+      owner,
+    ].join('|');
+  }
+
+  public static dataToPseudoId(data: ISettingsParsed) {
     const {
       group, category, name, owner,
     } = data;
@@ -184,4 +202,3 @@ class SettingsService {
 }
 
 export default SettingsService;
-export { SettingsService };
