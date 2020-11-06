@@ -38,7 +38,7 @@ const resolvers: IResolvers<any, Context> = {
       parent: ISettingsNode,
       args: any,
       context: Context) => {
-      const pseudoId = SettingsService.DataToPseudoId(parent);
+      const pseudoId = SettingsService.dataToPseudoId(parent);
       const loaders = createLoaders(context);
       const settingsData = await loaders.settings.load(pseudoId);
 
@@ -63,7 +63,7 @@ const resolvers: IResolvers<any, Context> = {
         id, group, category, name, owner, value,
       } = args;
 
-      const pseudoId = SettingsService.DataToPseudoId(args as ISettingsParsed);
+      const pseudoId = SettingsService.dataToPseudoId(args as ISettingsParsed);
       const loaders = createLoaders(context);
       loaders.settings.clear(pseudoId);
 
@@ -134,7 +134,7 @@ const resolvers: IResolvers<any, Context> = {
       const [settingsField] = await settingsService.getSettingsByIds([id]);
       const tupleName = `${settingsField.group}->${settingsField.category}->${settingsField.name}->owner:${settingsField.owner || 'none'}`;
       const loaders = createLoaders(context);
-      const pseudoId = SettingsService.DataToPseudoId(settingsField as ISettingsParsed);
+      const pseudoId = SettingsService.dataToPseudoId(settingsField as ISettingsParsed);
       loaders.settings.clear(pseudoId);
 
       try {

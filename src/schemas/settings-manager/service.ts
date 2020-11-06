@@ -72,7 +72,23 @@ class SettingsService {
     return nodes;
   }
 
+  /**
+   * @deprecated Use `dataToPseudoId` method
+   */
   public static DataToPseudoId(data: ISettingsParsed) {
+    const {
+      group, category, name, owner,
+    } = data;
+
+    return [
+      group,
+      category,
+      name,
+      owner,
+    ].join('|');
+  }
+
+  public static dataToPseudoId(data: ISettingsParsed) {
     const {
       group, category, name, owner,
     } = data;
