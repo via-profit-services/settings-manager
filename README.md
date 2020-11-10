@@ -6,7 +6,6 @@
 
 ![npm (scoped)](https://img.shields.io/npm/v/@via-profit-services/settings-manager?color=blue)
 ![NPM](https://img.shields.io/npm/l/@via-profit-services/settings-manager?color=blue)
-![npm bundle size (scoped)](https://img.shields.io/bundlephobia/minzip/@via-profit-services/settings-manager?color=green)
 
 ## Содержание
 
@@ -31,10 +30,6 @@
 ```bash
 yarn add @via-profit-services/settings-manager
 ```
-
-![npm (scoped)](https://img.shields.io/npm/v/@via-profit-services/settings-manager?color=blue)
-![Libraries.io dependency status for latest release, scoped npm package](https://img.shields.io/librariesio/release/npm/@via-profit-services/settings-manager?color=red)
-
 
 ### Миграции
 
