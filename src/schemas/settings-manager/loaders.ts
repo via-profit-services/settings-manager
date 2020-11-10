@@ -47,7 +47,7 @@ export default function createLoaders(context: Context) {
           id: uuidv4(),
         };
 
-        if (!newSettings.category || newSettings.group) {
+        if (!newSettings.category || !newSettings.group) {
           const { logger } = context as ExtendedContext;
           logger.settings.error('Invalid settings was passed', { newSettings });
 
