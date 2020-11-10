@@ -1,7 +1,7 @@
 {
     "name": "@via-profit-services/settings-manager",
     "support": "https://via-profit.ru",
-    "version": "0.7.6",
+    "version": "0.7.7",
     "description": "Via Profit Settings Manager Schema",
     "main": "dist/index.js",
     "engines": {
