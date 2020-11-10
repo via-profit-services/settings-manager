@@ -95,6 +95,7 @@ const resolvers: IResolvers<any, Context> = {
             comment: '',
             value,
           };
+          logger.settings.info(`Settings for tuple ${tupleName} not found. Need to create new record`, { group, category, name, owner });
           await settingsService.createSettings(newSettingsField);
 
           if (newSettingsField.owner) {
