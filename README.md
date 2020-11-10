@@ -5,8 +5,8 @@
 > Via Profit services / **Settings-Manager** - это пакет, который является частью сервиса, базирующегося на `via-profit-services` и представляет собой реализацию схемы для хранения каких-либо настроек, например, настроек ползователей.
 
 ![npm (scoped)](https://img.shields.io/npm/v/@via-profit-services/settings-manager?color=blue)
-![Libraries.io dependency status for latest release, scoped npm package](https://img.shields.io/librariesio/release/npm/@via-profit-services/settings-manager?color=red)
-
+![NPM](https://img.shields.io/npm/l/@via-profit-services/settings-manager?color=blue)
+![npm bundle size (scoped)](https://img.shields.io/bundlephobia/minzip/@via-profit-services/settings-manager?color=green)
 
 ## Содержание
 
