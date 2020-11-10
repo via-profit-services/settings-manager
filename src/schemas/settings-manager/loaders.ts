@@ -1,5 +1,5 @@
 import {
-  Node, DataLoader,
+  Node, DataLoader, ServerError,
 } from '@via-profit-services/core';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -34,15 +34,17 @@ export default function createLoaders(context: Context) {
           && node.name === name);
 
       // try to search settings for specified owner
-      const settings = settingsList.find((s) => s.owner === owner);
+      const settings = settingsList.find((s) => s.owner === (owner || null));
 
+      // if settings for specified owner not found
+      // will be created new settings record
       if (!settings) {
         const newSettings: ISettingsNode = {
           category,
           group,
           value: null,
           ...settingsList[0],
-          owner,
+          owner: owner || '',
           comment: '',
           id: uuidv4(),
         };
@@ -54,11 +56,14 @@ export default function createLoaders(context: Context) {
           return newSettings;
         }
 
+        if (!owner) {
+          throw new ServerError('Error. Check the global settings exist. Maybe you should to execute migrations for this', newSettings);
+        }
+
         service.createSettings(newSettings);
 
         return newSettings;
       }
-
 
       return settings;
     });

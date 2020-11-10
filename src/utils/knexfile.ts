@@ -1,4 +1,5 @@
 /* eslint-disable import/no-extraneous-dependencies */
+import 'graphql-import-node';
 import { configureApp } from './configureApp';
 
 const { database } = configureApp();
