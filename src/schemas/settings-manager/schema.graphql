@@ -3,12 +3,7 @@ extend type Query {
   """
   Returns settings
   """
-  settings(
-    """
-    If this property was set then settings will be returns only for this owner ID
-    """
-    owner: ID
-  ): SettingsCollection!
+  settings: SettingsCollection!
 }
 
 extend type Mutation {
@@ -45,10 +40,6 @@ type SettingsMutation {
     """
     value: JSON!
 
-    """
-    If this property was set then settings will be updated only for this owner ID
-    """
-    owner: ID
     ): SettingsValue!
 
   delete(id: ID!): Boolean!
