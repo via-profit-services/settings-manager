@@ -38,6 +38,9 @@ const resolvers: IResolvers<any, Context> = {
       parent: ISettingsNode,
       args: any,
       context: Context) => {
+      const { token } = context;
+      parent.owner = token.uuid;
+
       const pseudoId = SettingsService.dataToPseudoId(parent);
       const loaders = createLoaders(context);
       const settingsData = await loaders.settings.load(pseudoId);
@@ -59,11 +62,14 @@ const resolvers: IResolvers<any, Context> = {
   SettingsMutation: {
     set: async (parent, args: UpdateArgs, context) => {
       const { token, logger } = context as ExtendedContext;
-      const {
-        id, group, category, name, owner, value,
-      } = args;
-
-      const pseudoId = SettingsService.dataToPseudoId(args as ISettingsParsed);
+      const { id, group, category, name, value } = args;
+      const owner = token.uuid;
+      const pseudoId = SettingsService.dataToPseudoId({
+        group,
+        category,
+        name,
+        owner,
+      });
       const loaders = createLoaders(context);
       loaders.settings.clear(pseudoId);
 
@@ -131,8 +137,10 @@ const resolvers: IResolvers<any, Context> = {
       const { id } = args;
       const { token, logger } = context as ExtendedContext;
       const settingsService = new SettingsService({ context });
+      const owner = token.uuid;
 
       const [settingsField] = await settingsService.getSettingsByIds([id]);
+      settingsField.owner = owner;
       const tupleName = `${settingsField.group}->${settingsField.category}->${settingsField.name}->owner:${settingsField.owner || 'none'}`;
       const loaders = createLoaders(context);
       const pseudoId = SettingsService.dataToPseudoId(settingsField as ISettingsParsed);
@@ -164,7 +172,6 @@ interface UpdateArgs {
   name: string;
   value: any;
   id?: string;
-  owner?: string;
 }
 interface DeleteArgs {
   id: string;
