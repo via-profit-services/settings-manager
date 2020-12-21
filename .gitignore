@@ -1,18 +1,13 @@
 /node_modules/
+/node_modules/
 /.env
-/.env.prod
-
-# loggers
 /log
-
-# just sandbox
+/misc
 /sandbox.js
+/sessions
 
 # jest
 /coverage
-
-# express sessions
-/sessions
 
 # webpack temporary dir
 /build
@@ -22,5 +17,15 @@
 # jwt keys
 /keys
 
-# redis
-*.rdb
+# Redis sump
+/dump.rdb
+
+/sessions
+/package.tgz
+/package-*.tgz
+
+.yarn/*
+!.yarn/releases
+!.yarn/plugins
+!.yarn/sdks
+!.yarn/versions

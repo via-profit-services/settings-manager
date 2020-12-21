@@ -6,7 +6,7 @@ import { v4 as uuidv4 } from 'uuid';
 import createLoaders from '../loaders';
 import SettingsService from '../service';
 import {
-  TSettingsCategory, Context, ISettingsNode, ISettingsParsed, ExtendedContext,
+  TSettingsCategory, Context, ISettingsNode, ISettingsParsed,
 } from '../types';
 
 const resolvers: IResolvers<any, Context> = {
@@ -46,7 +46,7 @@ const resolvers: IResolvers<any, Context> = {
       const settingsData = await loaders.settings.load(pseudoId);
 
       if (typeof settingsData === 'undefined') {
-        const { logger } = context as ExtendedContext;
+        const { logger } = context;
 
         logger.settings.error(`Attempt to get a nonexistent field with pseudoId ${pseudoId}`, { parent });
         throw new BadRequestError('Settings of this params not exists', { parent });
@@ -61,7 +61,7 @@ const resolvers: IResolvers<any, Context> = {
   }),
   SettingsMutation: {
     set: async (parent, args: UpdateArgs, context) => {
-      const { token, logger } = context as ExtendedContext;
+      const { token, logger } = context;
       const { id, group, category, name, value } = args;
       const owner = token.uuid;
       const pseudoId = SettingsService.dataToPseudoId({
@@ -135,7 +135,7 @@ const resolvers: IResolvers<any, Context> = {
     },
     delete: async (parent, args: DeleteArgs, context) => {
       const { id } = args;
-      const { token, logger } = context as ExtendedContext;
+      const { token, logger } = context;
       const settingsService = new SettingsService({ context });
       const owner = token.uuid;
 

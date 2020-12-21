@@ -4,7 +4,7 @@ import {
 import { v4 as uuidv4 } from 'uuid';
 
 import SettingsService from './service';
-import { ISettingsNode, Context, ExtendedContext } from './types';
+import { ISettingsNode, Context } from './types';
 
 interface Loaders {
   settings: DataLoader<string, Node<ISettingsNode>>;
@@ -50,7 +50,7 @@ export default function createLoaders(context: Context) {
         };
 
         if (!newSettings.category || !newSettings.group) {
-          const { logger } = context as ExtendedContext;
+          const { logger } = context;
           logger.settings.error('Invalid settings was passed', { newSettings });
 
           return newSettings;

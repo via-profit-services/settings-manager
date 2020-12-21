@@ -1,4 +1,4 @@
-import { IContext, ILoggerCollection, Winston } from '@via-profit-services/core';
+import { IContext } from '@via-profit-services/core';
 
 export enum TSettingsCategory {
   general = 'general',
@@ -28,12 +28,7 @@ export interface MakeSchemaParams {
 }
 
 
-export declare type Context = Pick<IContext, 'knex' | 'timezone' | 'token'>;
-export interface ExtendedContext extends Context {
-  logger: ILoggerCollection & {
-      settings: Winston.Logger;
-  };
-}
+export declare type Context = Pick<IContext, 'knex' | 'timezone' | 'token' | 'logger'>;
 
 export interface ISettingsNode {
   createdAt: Date;
