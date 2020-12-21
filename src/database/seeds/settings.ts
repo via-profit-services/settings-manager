@@ -1,6 +1,5 @@
 /* eslint-disable import/prefer-default-export */
-/* eslint-disable import/no-extraneous-dependencies */
-import { Knex } from '@via-profit-services/core';
+import type Knex from 'knex';
 import { v4 as uuidv4 } from 'uuid';
 
 enum Category {

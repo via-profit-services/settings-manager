@@ -1,13 +1,12 @@
-/* eslint-disable import/prefer-default-export */
-import { IContext } from '@via-profit-services/core';
+import { Context } from '@via-profit-services/core';
+import type { MakeSchemaParams } from '@via-profit-services/settings';
+import '@via-profit-services/accounts';
 
-import { MakeSchemaParams } from './types';
-
-interface TSource {
+interface Source {
   owner?: string;
 }
 
-const makeSchema = (params: MakeSchemaParams) => {
+const schemaBuilder = (params: MakeSchemaParams) => {
   const typeDefs: string[] = [];
   const resolvers: any = {};
 
@@ -104,7 +103,7 @@ const makeSchema = (params: MakeSchemaParams) => {
 
     // define settings collection
     resolvers.SettingsCollection = resolvers.SettingsCollection || {};
-    resolvers.SettingsCollection[group] = (parent: TSource) => ({
+    resolvers.SettingsCollection[group] = (parent: Source) => ({
         ...parent,
         group,
       });
@@ -115,7 +114,7 @@ const makeSchema = (params: MakeSchemaParams) => {
       const namesOfThisTSettingsCategory = dataArray.filter((d) => d.category === category);
 
       // append category into the group
-      resolvers[`Settings${capitalizeGroup}Group`][category] = async (parent: TSource) => ({
+      resolvers[`Settings${capitalizeGroup}Group`][category] = async (parent: Source) => ({
           ...parent,
           category,
         });
@@ -124,7 +123,7 @@ const makeSchema = (params: MakeSchemaParams) => {
       namesOfThisTSettingsCategory.forEach(({ name }) => {
         const names = Array.isArray(name) ? name : [name];
         names.forEach((mname) => {
-          obj[mname] = async (parent: any, args: any, context: IContext) => {
+          obj[mname] = async (parent: any, args: any, context: Context) => {
             const { owner } = parent;
             const { token } = context;
 
@@ -148,4 +147,4 @@ const makeSchema = (params: MakeSchemaParams) => {
   };
 };
 
-export default makeSchema;
+export default schemaBuilder;

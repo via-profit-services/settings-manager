@@ -1,5 +1,4 @@
 extend type Query {
-
   """
   Returns settings
   """
@@ -11,7 +10,6 @@ extend type Mutation {
 }
 
 type SettingsMutation {
-
   """
   Set single settings field
   """
@@ -39,8 +37,7 @@ type SettingsMutation {
     Settings value
     """
     value: JSON!
-
-    ): SettingsValue!
+  ): SettingsValue!
 
   delete(id: ID!): Boolean!
 }
