@@ -3,6 +3,7 @@ import { makeExecutableSchema } from '@graphql-tools/schema';
 import * as accounts from '@via-profit-services/accounts';
 import * as core from '@via-profit-services/core';
 import * as knex from '@via-profit-services/knex';
+import * as subscriptions from '@via-profit-services/subscriptions';
 import dotenv from 'dotenv';
 import express from 'express';
 import http from 'http';
@@ -26,6 +27,10 @@ const server = http.createServer(app);
     },
   });
 
+  const subscriptionsMiddleware = subscriptions.factory({
+    server,
+  });
+
   const settings = settingsFactory({
     settings: {
       layout: [{
@@ -37,6 +42,7 @@ const server = http.createServer(app);
 
 
   const accountsMiddleware = await accounts.factory({
+    accessTokenExpiresIn: 31536000, // 1 year
     privateKey: path.resolve(__dirname, './jwtRS256.key'),
     publicKey: path.resolve(__dirname, './jwtRS256.key.pub'),
   });
@@ -46,11 +52,13 @@ const server = http.createServer(app);
       core.typeDefs,
       accounts.typeDefs,
       settings.typeDefs,
+      subscriptions.typeDefs,
     ],
     resolvers: [
       core.resolvers,
       accounts.resolvers,
       settings.resolvers,
+      subscriptions.resolvers,
     ],
   });
 
@@ -61,8 +69,9 @@ const server = http.createServer(app);
     debug: true,
     enableIntrospection: true,
     middleware: [
-      accountsMiddleware,
       knexMiddleware,
+      accountsMiddleware,
+      subscriptionsMiddleware,
       settings.middleware,
     ],
   });

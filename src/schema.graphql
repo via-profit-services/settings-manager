@@ -67,11 +67,11 @@ type SettingsCollection {
 Group of settings fields
 """
 type SettingsCommonGroup {
-  contact: SettingsCommonFields!
+  general: SettingsCommonFields!
 }
 
 type SettingsCommonFields {
-  developer: SettingsValue
+  version: SettingsValue
 }
 
 """

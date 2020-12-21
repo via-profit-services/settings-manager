@@ -27,6 +27,7 @@ const webpackBaseConfig: Configuration = {
   plugins: [
     new DefinePlugin({
       'process.env.MODULE_VERSION': JSON.stringify(version),
+      'process.env.MODULE_VERSION_ID': JSON.stringify('86c8a79c-f356-4c63-a4ee-b0fa579dedf7'),
     }),
   ],
   externals: [

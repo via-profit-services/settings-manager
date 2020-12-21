@@ -54,6 +54,8 @@ const settingsMiddlewareFactory: SettingsMiddlewareFactory = (configuration) => 
           category,
           group,
           value: null,
+          createdAt: new Date(),
+          updatedAt: new Date(),
           ...settingsList[0],
           owner: owner || '',
           comment: '',
@@ -61,11 +63,11 @@ const settingsMiddlewareFactory: SettingsMiddlewareFactory = (configuration) => 
         };
 
         if (!newSettings.category || !newSettings.group) {
-          throw new ServerError('Invalid settings was passed', { newSettings });
+          throw new ServerError('SettingsManager. Invalid settings was passed', { newSettings });
         }
 
         if (!owner) {
-          throw new ServerError('Error. Check the global settings exist. Maybe you should to execute migrations for this', newSettings);
+          throw new ServerError('SettingsManager. Check the global settings exist. Maybe you should to execute migrations for this', newSettings);
         }
 
         service.createSettings(newSettings);
@@ -82,13 +84,16 @@ const settingsMiddlewareFactory: SettingsMiddlewareFactory = (configuration) => 
     return pool;
   }
 
+  const composedResolvers = {
+    ...staticResolvers,
+    ...resolvers,
+  };
+
+
   return {
     middleware,
     typeDefs: `${staticTypeDefs}\n\n${typeDefs}`,
-    resolvers: {
-      ...staticResolvers,
-      ...resolvers,
-    },
+    resolvers: composedResolvers,
   };
 }
 

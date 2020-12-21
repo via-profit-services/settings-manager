@@ -1,5 +1,6 @@
 import { IObjectTypeResolver, IFieldResolver } from '@graphql-tools/utils';
-import { Context, ServerError } from '@via-profit-services/core';
+import { ACCESS_TOKEN_EMPTY_UUID } from '@via-profit-services/accounts';
+import { Context, ServerError, BadRequestError } from '@via-profit-services/core';
 import type { SettingsCategory, SettingsNode, SettingsParsed } from '@via-profit-services/settings';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -18,6 +19,11 @@ const setResolver: IFieldResolver<any, Context, UpdateArgs> = async (_parent, ar
   const { token, services, dataloader, logger } = context;
   const { id, group, category, name, value } = args;
   const owner = token.uuid;
+
+  if (token.uuid === ACCESS_TOKEN_EMPTY_UUID) {
+    throw new BadRequestError('SettingsManager. Missing or invalid token');
+  }
+
   const pseudoId = services.settings.dataToPseudoId({
     group,
     category,
@@ -63,7 +69,7 @@ const setResolver: IFieldResolver<any, Context, UpdateArgs> = async (_parent, ar
 
       return args;
     } catch (err) {
-      throw new ServerError('Failed to create settings', { err });
+      throw new ServerError('SettingsManager. Failed to create settings', { err });
     }
   } else {
     // update settings
@@ -71,16 +77,16 @@ const setResolver: IFieldResolver<any, Context, UpdateArgs> = async (_parent, ar
       await services.settings.updateSettings(settingsField.id, { value });
 
       if (settingsField.owner) {
-        logger.server.debug.info(`Account ${token.uuid} updated personal settings ${tupleName} to set «${JSON.stringify(value)}»`, { settingsID: settingsField.id });
+        logger.server.debug(`Account ${token.uuid} updated personal settings ${tupleName} to set «${JSON.stringify(value)}»`, { settingsID: settingsField.id });
       } else {
-        logger.server.debug.info(`Account ${token.uuid} updated global settings ${tupleName} to set ${JSON.stringify(value)}`, { settingsID: settingsField.id });
+        logger.server.debug(`Account ${token.uuid} updated global settings ${tupleName} to set ${JSON.stringify(value)}`, { settingsID: settingsField.id });
       }
 
       const [newSettingsField] = await services.settings.getSettingsByIds([settingsField.id]);
 
       return newSettingsField;
     } catch (err) {
-      throw new ServerError(`Failed to update settings with id ${settingsField.id}`, { err });
+      throw new ServerError(`SettingsManager. Failed to update settings with id ${settingsField.id}`, { err });
     }
   }
 }
@@ -89,6 +95,10 @@ const deleteResolver: IFieldResolver<any, Context, DeleteArgs> = async (parent, 
   const { id } = args;
   const { token, logger, services, dataloader } = context;
   const owner = token.uuid;
+
+  if (token.uuid === ACCESS_TOKEN_EMPTY_UUID) {
+    throw new BadRequestError('SettingsManager. Missing or invalid token');
+  }
 
   const [settingsField] = await services.settings.getSettingsByIds([id]);
   settingsField.owner = owner;
@@ -100,7 +110,7 @@ const deleteResolver: IFieldResolver<any, Context, DeleteArgs> = async (parent, 
   try {
     await services.settings.deleteSettings(id);
   } catch (err) {
-    throw new ServerError(`Failed to delete settings ${tupleName} with id ${id}`, { err });
+    throw new ServerError(`SettingsManager. Failed to delete settings ${tupleName} with id ${id}`, { err });
   }
 
   if (settingsField.owner) {
