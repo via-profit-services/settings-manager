@@ -1,6 +1,6 @@
 import { ACCESS_TOKEN_EMPTY_UUID } from '@via-profit-services/accounts';
 import { Context, BadRequestError } from '@via-profit-services/core';
-import type { SettingsNode } from '@via-profit-services/settings';
+import type { SettingsNode } from '@via-profit-services/settings-manager';
 
 const SettingsValue = new Proxy({
   id: () => ({}),

@@ -1,7 +1,7 @@
 import { IObjectTypeResolver, IFieldResolver } from '@graphql-tools/utils';
 import { ACCESS_TOKEN_EMPTY_UUID } from '@via-profit-services/accounts';
 import { Context, ServerError, BadRequestError } from '@via-profit-services/core';
-import type { SettingsCategory, SettingsNode, SettingsParsed } from '@via-profit-services/settings';
+import type { SettingsCategory, SettingsNode, SettingsParsed } from '@via-profit-services/settings-manager';
 import { v4 as uuidv4 } from 'uuid';
 
 interface UpdateArgs {

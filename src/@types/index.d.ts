@@ -61,7 +61,7 @@ declare module '@via-profit-services/settings-manager' {
   /**
    * Settings manager service
    */
-  class SettingsService {
+  export class SettingsService {
     props: SettingsServiceProps;
     constructor(props: SettingsServiceProps);
 
@@ -101,6 +101,9 @@ declare module '@via-profit-services/settings-manager' {
 
 
   }
+
+  export const factory: SettingsMiddlewareFactory;
+  export default SettingsMiddlewareFactory;
 }
 
 

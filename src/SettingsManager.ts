@@ -1,6 +1,6 @@
 import { OutputFilter } from '@via-profit-services/core';
 import { convertWhereToKnex, convertOrderByToKnex, convertJsonToKnex, convertSearchToKnex } from '@via-profit-services/knex';
-import type { SettingsNode, SettingsParsed, SettingsCategory, SettingsServiceProps } from '@via-profit-services/settings';
+import type { SettingsNode, SettingsParsed, SettingsCategory, SettingsServiceProps } from '@via-profit-services/settings-manager';
 import moment from 'moment-timezone';
 
 

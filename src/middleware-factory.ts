@@ -1,5 +1,5 @@
 import { Middleware, Node, ServerError } from '@via-profit-services/core';
-import type { SettingsMiddlewareFactory, SettingsNode } from '@via-profit-services/settings';
+import type { SettingsMiddlewareFactory, SettingsNode } from '@via-profit-services/settings-manager';
 import DataLoader from 'dataloader';
 import { v4 as uuidv4 } from 'uuid';
 

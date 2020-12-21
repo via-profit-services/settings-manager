@@ -1,5 +1,5 @@
 import { Context } from '@via-profit-services/core';
-import type { MakeSchemaParams } from '@via-profit-services/settings';
+import type { MakeSchemaParams } from '@via-profit-services/settings-manager';
 import '@via-profit-services/accounts';
 
 interface Source {
