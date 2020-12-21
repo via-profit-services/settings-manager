@@ -1,4 +1,4 @@
-declare module '@via-profit-services/settings' {
+declare module '@via-profit-services/settings-manager' {
   import { Middleware, Context, OutputFilter } from '@via-profit-services/core';
 
   export interface MakeSchemaParams {
@@ -106,7 +106,7 @@ declare module '@via-profit-services/settings' {
 
 declare module '@via-profit-services/core' {
   import DataLoader from 'dataloader';
-  import { SettingsService, SettingsNode } from '@via-profit-services/settings';
+  import { SettingsService, SettingsNode } from '@via-profit-services/settings-manager';
 
   interface DataLoaderCollection {
     /**
