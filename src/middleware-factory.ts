@@ -70,7 +70,11 @@ const settingsMiddlewareFactory: SettingsMiddlewareFactory = (configuration) => 
           throw new ServerError('SettingsManager. Check the global settings exist. Maybe you should to execute migrations for this', newSettings);
         }
 
-        service.createSettings(newSettings);
+        try {
+          service.createSettings(newSettings);
+        } catch (err) {
+          throw new ServerError('Failed to create new settings record', { err });
+        }
 
         return newSettings;
       }

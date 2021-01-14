@@ -133,7 +133,7 @@ class SettingsService {
     const data = {
       ...settingsField,
       id,
-      value: convertJsonToKnex(knex, settingsField.value),
+      value: JSON.stringify(settingsField.value),
       updatedAt: moment.tz(timezone).format(),
     };
     const [affectedId]: string[] = await knex<Partial<SettingsTableModel>>('settings')
@@ -154,10 +154,9 @@ class SettingsService {
       ...settingsField,
       createdAt: moment.tz(timezone).format(),
       updatedAt: moment.tz(timezone).format(),
-      value: typeof settingsField.value === 'undefined'
-        ? null
-        : convertJsonToKnex(knex, settingsField.value),
+      value: JSON.stringify(settingsField.value),
     };
+
     const [affectedId]: string[] = await knex<Partial<SettingsTableModel>>('settings')
       .insert(data)
       .returning('id');
