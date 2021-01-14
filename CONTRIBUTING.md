@@ -74,13 +74,13 @@ psql
 
 ```bash
 create user services with password 'admin';
-create database services_settings_manager;
-grant all privileges on database services_settings_manager to services;
+create database services_settings;
+grant all privileges on database services_settings to services;
 ```
 
 3. Попробуйте выполнить подключение:
 ```bash
-psql --host=localhost --username=services --dbname=services_settings_manager --password
+psql --host=localhost --username=services --dbname=services_settings --password
 ```
 
 Команда для выхода из оболочки psql - `\q`

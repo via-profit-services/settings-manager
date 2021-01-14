@@ -1,9 +1,11 @@
+/* eslint-disable import/max-dependencies */
 /* eslint-disable no-console */
 import { makeExecutableSchema } from '@graphql-tools/schema';
 import * as accounts from '@via-profit-services/accounts';
 import * as core from '@via-profit-services/core';
 import * as knex from '@via-profit-services/knex';
-import * as subscriptions from '@via-profit-services/subscriptions';
+import * as redis from '@via-profit-services/redis';
+import * as sms from '@via-profit-services/sms';
 import dotenv from 'dotenv';
 import express from 'express';
 import http from 'http';
@@ -27,10 +29,6 @@ const server = http.createServer(app);
     },
   });
 
-  const subscriptionsMiddleware = subscriptions.factory({
-    server,
-  });
-
   const settings = settingsFactory({
     settings: {
       layout: [{
@@ -40,11 +38,25 @@ const server = http.createServer(app);
     },
   })
 
+  const redisMiddleware = redis.factory({
+    host: 'localhost',
+    db: 3,
+    password: '',
+  });
+
+  const smsMiddleware = sms.factory({
+    provider: 'smsc.ru',
+    login: '',
+    password: '',
+  });
 
   const accountsMiddleware = await accounts.factory({
-    accessTokenExpiresIn: 31536000, // 1 year
+    accessTokenExpiresIn: 60 * 60 * 24 * 30,
     privateKey: path.resolve(__dirname, './jwtRS256.key'),
     publicKey: path.resolve(__dirname, './jwtRS256.key.pub'),
+    enableIntrospection: true,
+    defaultAccess: 'grant',
+    defaultPermissions: accounts.DEFAULT_PERMISSIONS,
   });
 
   const schema = makeExecutableSchema({
@@ -52,13 +64,11 @@ const server = http.createServer(app);
       core.typeDefs,
       accounts.typeDefs,
       settings.typeDefs,
-      subscriptions.typeDefs,
     ],
     resolvers: [
       core.resolvers,
       accounts.resolvers,
       settings.resolvers,
-      subscriptions.resolvers,
     ],
   });
 
@@ -67,11 +77,11 @@ const server = http.createServer(app);
     server,
     schema,
     debug: true,
-    enableIntrospection: true,
     middleware: [
       knexMiddleware,
+      redisMiddleware,
+      smsMiddleware,
       accountsMiddleware,
-      subscriptionsMiddleware,
       settings.middleware,
     ],
   });
@@ -79,7 +89,6 @@ const server = http.createServer(app);
   app.use(graphQLExpress);
   server.listen(PORT, () => {
     console.log(`GraphQL Server started at http://localhost:${PORT}/graphql`);
-    console.log(`Subscriptions server started at ws://localhost:${PORT}/graphql`);
   })
 
 })();
