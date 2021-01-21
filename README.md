@@ -162,7 +162,6 @@ export async function down(knex: Knex): Promise<any> {
  - Settings - Класс, реализующий модель данного модуля
  - makeSchema - Генератор типов и резолверов для пользовательскиъ настроек
  - TSettingsCategory - ENUM Интерфейс категорий настроек
- - configureSettingsLogger - Функция конфигурации логгера
 
 
 
@@ -173,7 +172,7 @@ import path from 'path';
 import { App } from '@via-profit-services/core';
 import * as settingsManager from '@via-profit-services/settings-manager';
 
-const { TSettingsCategory, makeSchema, configureSettingsLogger } = settingsManager; 
+const { TSettingsCategory, makeSchema } = settingsManager; 
 
 // generate settings schema
 const customSettings = makeSchema({
@@ -202,9 +201,7 @@ const app = new App({
   ...
   logger: configureLogger({
     logDir,
-    loggers: {
-      settings: configureSettingsLogger({ logDir }),
-    },
+
   }),
   typeDefs: [
     settingsManager.typeDefs, // settings required types

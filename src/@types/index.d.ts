@@ -18,6 +18,7 @@ declare module '@via-profit-services/settings-manager' {
 
   export interface Configuration {
     settings: MakeSchemaParams;
+    ownerResolver: OwnerResolverFunc;
   }
 
   export type SettingsCategory = 
@@ -58,12 +59,17 @@ declare module '@via-profit-services/settings-manager' {
     context: Context;
   }
 
+  export type OwnerResolverFunc = (context: Context) => string;
+
   /**
    * Settings manager service
    */
   export class SettingsService {
     props: SettingsServiceProps;
+    ownerResolver: OwnerResolverFunc;
+
     constructor(props: SettingsServiceProps);
+
 
     /**
      * Get settings recors list by filter

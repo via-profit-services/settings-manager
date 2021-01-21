@@ -10,7 +10,7 @@ import SettingsManager from './SettingsManager';
 
 const settingsMiddlewareFactory: SettingsMiddlewareFactory = (configuration) => {
 
-  const { settings } = configuration;
+  const { settings, ownerResolver } = configuration;
   const pool: ReturnType<Middleware> = {
     context: null,
   };
@@ -26,10 +26,11 @@ const settingsMiddlewareFactory: SettingsMiddlewareFactory = (configuration) => 
 
     pool.context = context;
 
-    /**
-     * Inject Settings service
-     */
+    // Inject Settings service
     const service = new SettingsManager({ context });
+
+    service.ownerResolver = ownerResolver;
+
     pool.context.services.settings = service;
 
     pool.context.dataloader.settings = new DataLoader<

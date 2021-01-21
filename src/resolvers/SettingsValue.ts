@@ -1,4 +1,3 @@
-import { ACCESS_TOKEN_EMPTY_UUID } from '@via-profit-services/accounts';
 import { Context, BadRequestError } from '@via-profit-services/core';
 import type { SettingsNode } from '@via-profit-services/settings-manager';
 
@@ -13,15 +12,10 @@ const SettingsValue = new Proxy({
 }, {
   get: (target, prop: keyof SettingsNode) => async (
     parent: SettingsNode,
-    args: any,
+    _args: any,
     context: Context) => {
-    const { token, services, dataloader } = context;
+    const { services, dataloader } = context;
 
-    if (token.uuid === ACCESS_TOKEN_EMPTY_UUID) {
-      throw new BadRequestError('SettingsManager. Missing or invalid token');
-    }
-
-    parent.owner = token.uuid;
     const pseudoId = services.settings.dataToPseudoId(parent);
     const settingsData = await dataloader.settings.load(pseudoId);
 

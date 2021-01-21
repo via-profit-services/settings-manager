@@ -1,6 +1,5 @@
 import { IObjectTypeResolver, IFieldResolver } from '@graphql-tools/utils';
-import { ACCESS_TOKEN_EMPTY_UUID } from '@via-profit-services/accounts';
-import { Context, ServerError, BadRequestError } from '@via-profit-services/core';
+import { Context, ServerError } from '@via-profit-services/core';
 import type { SettingsCategory, SettingsNode, SettingsParsed } from '@via-profit-services/settings-manager';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -16,14 +15,10 @@ interface DeleteArgs {
 }
 
 const setResolver: IFieldResolver<any, Context, UpdateArgs> = async (_parent, args, context) => {
-  const { token, services, dataloader, logger } = context;
+  const { services, dataloader, logger } = context;
   const { id, group, category, name, value } = args;
-  const owner = token.uuid;
 
-  if (token.uuid === ACCESS_TOKEN_EMPTY_UUID) {
-    throw new BadRequestError('SettingsManager. Missing or invalid token');
-  }
-
+  const owner = services.settings.ownerResolver(context);
   const pseudoId = services.settings.dataToPseudoId({
     group,
     category,
@@ -61,12 +56,6 @@ const setResolver: IFieldResolver<any, Context, UpdateArgs> = async (_parent, ar
       logger.server.debug(`Settings for tuple ${tupleName} not found. Need to create new record`, { group, category, name, owner });
       await services.settings.createSettings(newSettingsField);
 
-      if (newSettingsField.owner) {
-        logger.server.debug(`Account ${token.uuid} created new personal settings ${tupleName} to set «${JSON.stringify(value)}»`, { settingsID: newSettingsField.id });
-      } else {
-        logger.server.debug(`Account ${token.uuid} created new global settings ${tupleName} to set ${JSON.stringify(value)}`, { settingsID: newSettingsField.id });
-      }
-
       return args;
     } catch (err) {
       throw new ServerError('SettingsManager. Failed to create settings', { err });
@@ -75,12 +64,6 @@ const setResolver: IFieldResolver<any, Context, UpdateArgs> = async (_parent, ar
     // update settings
     try {
       await services.settings.updateSettings(settingsField.id, { value });
-
-      if (settingsField.owner) {
-        logger.server.debug(`Account ${token.uuid} updated personal settings ${tupleName} to set «${JSON.stringify(value)}»`, { settingsID: settingsField.id });
-      } else {
-        logger.server.debug(`Account ${token.uuid} updated global settings ${tupleName} to set ${JSON.stringify(value)}`, { settingsID: settingsField.id });
-      }
 
       const [newSettingsField] = await services.settings.getSettingsByIds([settingsField.id]);
 
@@ -91,15 +74,11 @@ const setResolver: IFieldResolver<any, Context, UpdateArgs> = async (_parent, ar
   }
 }
 
-const deleteResolver: IFieldResolver<any, Context, DeleteArgs> = async (parent, args, context) => {
+const deleteResolver: IFieldResolver<any, Context, DeleteArgs> = async (_parent, args, context) => {
   const { id } = args;
-  const { token, logger, services, dataloader } = context;
-  const owner = token.uuid;
+  const { services, dataloader } = context;
 
-  if (token.uuid === ACCESS_TOKEN_EMPTY_UUID) {
-    throw new BadRequestError('SettingsManager. Missing or invalid token');
-  }
-
+  const owner = services.settings.ownerResolver(context);
   const [settingsField] = await services.settings.getSettingsByIds([id]);
   settingsField.owner = owner;
   const tupleName = `${settingsField.group}->${settingsField.category}->${settingsField.name}->owner:${settingsField.owner || 'none'}`;
@@ -111,14 +90,6 @@ const deleteResolver: IFieldResolver<any, Context, DeleteArgs> = async (parent, 
     await services.settings.deleteSettings(id);
   } catch (err) {
     throw new ServerError(`SettingsManager. Failed to delete settings ${tupleName} with id ${id}`, { err });
-  }
-
-  if (settingsField.owner) {
-    logger.server.debug(`Account ${token.uuid} deleted personal settings ${tupleName}`,
-      { settingsID: settingsField.id });
-  } else {
-    logger.server.debug(`Account ${token.uuid} deleted global settings ${tupleName}`,
-      { settingsID: settingsField.id });
   }
 
   return true;

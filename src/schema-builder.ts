@@ -1,10 +1,5 @@
-import { Context } from '@via-profit-services/core';
 import type { MakeSchemaParams } from '@via-profit-services/settings-manager';
 import '@via-profit-services/accounts';
-
-interface Source {
-  owner?: string;
-}
 
 const schemaBuilder = (params: MakeSchemaParams) => {
   const typeDefs: string[] = [];
@@ -103,7 +98,7 @@ const schemaBuilder = (params: MakeSchemaParams) => {
 
     // define settings collection
     resolvers.SettingsCollection = resolvers.SettingsCollection || {};
-    resolvers.SettingsCollection[group] = (parent: Source) => ({
+    resolvers.SettingsCollection[group] = (parent: any) => ({
         ...parent,
         group,
       });
@@ -114,7 +109,7 @@ const schemaBuilder = (params: MakeSchemaParams) => {
       const namesOfThisTSettingsCategory = dataArray.filter((d) => d.category === category);
 
       // append category into the group
-      resolvers[`Settings${capitalizeGroup}Group`][category] = async (parent: Source) => ({
+      resolvers[`Settings${capitalizeGroup}Group`][category] = async (parent: any) => ({
           ...parent,
           category,
         });
@@ -123,16 +118,10 @@ const schemaBuilder = (params: MakeSchemaParams) => {
       namesOfThisTSettingsCategory.forEach(({ name }) => {
         const names = Array.isArray(name) ? name : [name];
         names.forEach((mname) => {
-          obj[mname] = async (parent: any, args: any, context: Context) => {
-            const { owner } = parent;
-            const { token } = context;
-
-            return {
+          obj[mname] = async (parent: any) => ({
               ...parent,
-              owner: owner || token.uuid,
               name: mname,
-            };
-          };
+            });
         });
       });
 

@@ -1,6 +1,6 @@
 import { OutputFilter } from '@via-profit-services/core';
-import { convertWhereToKnex, convertOrderByToKnex, convertJsonToKnex, convertSearchToKnex } from '@via-profit-services/knex';
-import type { SettingsNode, SettingsParsed, SettingsCategory, SettingsServiceProps } from '@via-profit-services/settings-manager';
+import { convertWhereToKnex, convertOrderByToKnex, convertSearchToKnex } from '@via-profit-services/knex';
+import type { SettingsNode, SettingsParsed, SettingsCategory, SettingsServiceProps, OwnerResolverFunc } from '@via-profit-services/settings-manager';
 import moment from 'moment-timezone';
 
 
@@ -31,6 +31,7 @@ interface SettingsTableModelResult {
 
 class SettingsService {
   public props: SettingsServiceProps;
+  public ownerResolver: OwnerResolverFunc;
 
   public constructor(props: SettingsServiceProps) {
     this.props = props;

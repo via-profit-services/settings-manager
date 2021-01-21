@@ -1091,31 +1091,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@via-profit-services/accounts@file://home/dhs/Projects/@via-profit-services/accounts/package-1.0.0-rc.8.tgz::locator=%40via-profit-services%2Fsettings-manager%40workspace%3A.":
-  version: 1.0.0-rc.8
-  resolution: "@via-profit-services/accounts@file://home/dhs/Projects/@via-profit-services/accounts/package-1.0.0-rc.8.tgz::locator=%40via-profit-services%2Fsettings-manager%40workspace%3A."
-  dependencies:
-    bcryptjs: ^2.4.3
-    jsonwebtoken: ^8.5.1
-  peerDependencies:
-    "@via-profit-services/core": ^1.0.0
-    "@via-profit-services/knex": ^1.0.0
-    "@via-profit-services/redis": ^1.0.0
-    "@via-profit-services/sms": ^1.0.0
-    graphql: "*"
-    libphonenumber-js: "*"
-    moment: "*"
-    moment-timezone: "*"
-    uuid: "*"
-    winston: "*"
-    winston-daily-rotate-file: "*"
-  checksum: e28cddd43c79e1147305b0fcaf7bbacd0119d22e483bf390025c44c34543a67d4f0aac61fd3378a37b010d031c9a1d258e9c8ca2e50c178cc60c9807c1d4eb68
-  languageName: node
-  linkType: hard
-
-"@via-profit-services/core@file://home/dhs/Projects/@via-profit-services/core/package-1.0.0-rc.1.tgz::locator=%40via-profit-services%2Fsettings-manager%40workspace%3A.":
-  version: 1.0-rc.1
-  resolution: "@via-profit-services/core@file://home/dhs/Projects/@via-profit-services/core/package-1.0.0-rc.1.tgz::locator=%40via-profit-services%2Fsettings-manager%40workspace%3A."
+"@via-profit-services/core@file://home/dhs/Projects/@via-profit-services/core/package-1.0.0-rc.3.tgz::locator=%40via-profit-services%2Fsettings-manager%40workspace%3A.":
+  version: 1.0.0-rc.3
+  resolution: "@via-profit-services/core@file://home/dhs/Projects/@via-profit-services/core/package-1.0.0-rc.3.tgz::locator=%40via-profit-services%2Fsettings-manager%40workspace%3A."
   dependencies:
     bufferutil: ^4.0.2
     content-type: ^1.0.4
@@ -1134,7 +1112,7 @@ __metadata:
       optional: true
     utf-8-validate:
       optional: true
-  checksum: 061625c2014e55f7e07cbc7235bb240d44513388b3f0ca3ce35d33e45f78c887340db9f87a0ed92912d59764a5d032b21f988c7eba4ea26e368be90c6aa1eda9
+  checksum: d3a8c11d96d4a992e1bfedff501934abd4f21dfba4e48d6dce5143afca77b7c9c0d369a0d7458ed1b2bc4ecd47c1856cbdf74f2d5458c3618a98d5be25e03b7c
   languageName: node
   linkType: hard
 
@@ -1145,24 +1123,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@via-profit-services/knex@file://home/dhs/Projects/@via-profit-services/knex/package-1.0.0-rc.1.tgz::locator=%40via-profit-services%2Fsettings-manager%40workspace%3A.":
-  version: 1.0.0-rc.1
-  resolution: "@via-profit-services/knex@file://home/dhs/Projects/@via-profit-services/knex/package-1.0.0-rc.1.tgz::locator=%40via-profit-services%2Fsettings-manager%40workspace%3A."
+"@via-profit-services/knex@file://home/dhs/Projects/@via-profit-services/knex/package-1.0.0-rc.2.tgz::locator=%40via-profit-services%2Fsettings-manager%40workspace%3A.":
+  version: 1.0.0-rc.2
+  resolution: "@via-profit-services/knex@file://home/dhs/Projects/@via-profit-services/knex/package-1.0.0-rc.2.tgz::locator=%40via-profit-services%2Fsettings-manager%40workspace%3A."
   peerDependencies:
     "@via-profit-services/core": 1.x.x
-    knex: 1.x.x
+    knex: ^0.21.12
     pg: ^8.5.1
-  checksum: 0892df69eac7fff4bbb1bbf4a56c9dcea9b6ae87feb9a92903a50f2bb193e53403903f92f2d76d6bb30449ee5a737f66ef98c771d2d68beff2a169ad37826c22
-  languageName: node
-  linkType: hard
-
-"@via-profit-services/redis@file://home/dhs/Projects/@via-profit-services/redis/package-1.0.0-rc.1.tgz::locator=%40via-profit-services%2Fsettings-manager%40workspace%3A.":
-  version: 1.0.0-rc.1
-  resolution: "@via-profit-services/redis@file://home/dhs/Projects/@via-profit-services/redis/package-1.0.0-rc.1.tgz::locator=%40via-profit-services%2Fsettings-manager%40workspace%3A."
-  peerDependencies:
-    "@via-profit-services/core": ^1.0.0
-    ioredis: "*"
-  checksum: dc2bd79bea847d4a5029865713b1547952f0ba509810075d9105afbfc426f89f56cd31201ed58d9fb9dc55f9aa4c9d85172afd8ff104f99d0994fd808020cf27
+  checksum: c16a949f8803a04d34dd3e185322f3677ce4bdadd5be3537e1183caa7f15b774f4c6a7473346a98707248ec55026fcd031ea5c3f582499e638fe2ea281c64e61
   languageName: node
   linkType: hard
 
@@ -1187,12 +1155,9 @@ __metadata:
     "@types/webpack-node-externals": ^1.7.0
     "@typescript-eslint/eslint-plugin": ^4.6.1
     "@typescript-eslint/parser": ^4.6.1
-    "@via-profit-services/accounts": "file://home/dhs/Projects/@via-profit-services/accounts/package-1.0.0-rc.8.tgz"
-    "@via-profit-services/core": "file://home/dhs/Projects/@via-profit-services/core/package-1.0.0-rc.1.tgz"
+    "@via-profit-services/core": "file://home/dhs/Projects/@via-profit-services/core/package-1.0.0-rc.3.tgz"
     "@via-profit-services/eslint-config": ^0.1.11
-    "@via-profit-services/knex": "file://home/dhs/Projects/@via-profit-services/knex/package-1.0.0-rc.1.tgz"
-    "@via-profit-services/redis": "file://home/dhs/Projects/@via-profit-services/redis/package-1.0.0-rc.1.tgz"
-    "@via-profit-services/sms": "file://home/dhs/Projects/@via-profit-services/sms/package-1.0.0-rc.1.tgz"
+    "@via-profit-services/knex": "file://home/dhs/Projects/@via-profit-services/knex/package-1.0.0-rc.2.tgz"
     "@zerollup/ts-transform-paths": ^1.7.11
     clean-webpack-plugin: ^3.0.0
     copy-webpack-plugin: ^5.1.1
@@ -1245,7 +1210,6 @@ __metadata:
     winston: ^3.3.3
     winston-daily-rotate-file: ^4.5.0
   peerDependencies:
-    "@via-profit-services/accounts": ^1.0.0
     "@via-profit-services/core": ^1.0.0
     "@via-profit-services/knex": ^1.0.0
     dataloader: "*"
@@ -1253,20 +1217,8 @@ __metadata:
     moment: "*"
     moment-timezone: "*"
     uuid: "*"
-    winston: "*"
-    winston-daily-rotate-file: "*"
   languageName: unknown
   linkType: soft
-
-"@via-profit-services/sms@file://home/dhs/Projects/@via-profit-services/sms/package-1.0.0-rc.1.tgz::locator=%40via-profit-services%2Fsettings-manager%40workspace%3A.":
-  version: 1.0.0-rc.1
-  resolution: "@via-profit-services/sms@file://home/dhs/Projects/@via-profit-services/sms/package-1.0.0-rc.1.tgz::locator=%40via-profit-services%2Fsettings-manager%40workspace%3A."
-  peerDependencies:
-    "@via-profit-services/core": "*"
-    uuid: "*"
-  checksum: 1597a21b9a531491f14de96386c55d31ef9361ff6a7cc8dde7dd7d79156bb39ae02a4956078a408faff10a1e61b1838cf2b6e0b76148a6de6547f958b5c6bcd4
-  languageName: node
-  linkType: hard
 
 "@webassemblyjs/ast@npm:1.9.1":
   version: 1.9.1
@@ -2217,13 +2169,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"bcryptjs@npm:^2.4.3":
-  version: 2.4.3
-  resolution: "bcryptjs@npm:2.4.3"
-  checksum: 5a320711757b5932da200856a5193cad0123df7c43b46417172eabf2aa436a8f08f64851722052fea6335453f96290005b6694a7dd26d8951810362de343175c
-  languageName: node
-  linkType: hard
-
 "big.js@npm:^5.2.2":
   version: 5.2.2
   resolution: "big.js@npm:5.2.2"
@@ -2529,13 +2474,6 @@ __metadata:
   version: 0.2.13
   resolution: "buffer-crc32@npm:0.2.13"
   checksum: 0340e848d6fd87e49ef6f1067f31b2a8d2e71b433e9bb62ff3d9bc2499146f0be586b5b80b0d099c7110a226161b21cb6cd80162dd5a51d9ebdb03da58b99637
-  languageName: node
-  linkType: hard
-
-"buffer-equal-constant-time@npm:1.0.1":
-  version: 1.0.1
-  resolution: "buffer-equal-constant-time@npm:1.0.1"
-  checksum: a38a6fead170594b97894658d0e62e3686ccaecea480051c0bf69ba29274eca87203452590c3b6a1b589a7da1baef89420da00a8f08c010675c1dbc25f58edf9
   languageName: node
   linkType: hard
 
@@ -4034,15 +3972,6 @@ __metadata:
     jsbn: ~0.1.0
     safer-buffer: ^2.1.0
   checksum: 5b4dd05f24b2b94c1bb882488dba2b878bb5b83182669aa71fbdf53c6941618180cb226c4eb9a3e2fa51ad11f87b5edb0a7d7289cdef468ba2e6024542f73f07
-  languageName: node
-  linkType: hard
-
-"ecdsa-sig-formatter@npm:1.0.11":
-  version: 1.0.11
-  resolution: "ecdsa-sig-formatter@npm:1.0.11"
-  dependencies:
-    safe-buffer: ^5.0.1
-  checksum: 9d07775ee274e0ca3978a562e9eba14ce77ecc804d977d0e94525c2aa4a70d909eda5703810955d22fd06fc6312e6aacf85e233eebdabc7b27a0a38fd62902a4
   languageName: node
   linkType: hard
 
@@ -7609,24 +7538,6 @@ fsevents@~2.1.2:
   languageName: node
   linkType: hard
 
-"jsonwebtoken@npm:^8.5.1":
-  version: 8.5.1
-  resolution: "jsonwebtoken@npm:8.5.1"
-  dependencies:
-    jws: ^3.2.2
-    lodash.includes: ^4.3.0
-    lodash.isboolean: ^3.0.3
-    lodash.isinteger: ^4.0.4
-    lodash.isnumber: ^3.0.3
-    lodash.isplainobject: ^4.0.6
-    lodash.isstring: ^4.0.1
-    lodash.once: ^4.0.0
-    ms: ^2.1.1
-    semver: ^5.6.0
-  checksum: ea44bbb7a7abab87eee57711a04093a2a04a5757faa3253f521327b840e07eff751986ed6c20985886c5aaa86245a833aa1eeda6eacb0c3fa9ea4e7074cdb0c3
-  languageName: node
-  linkType: hard
-
 "jsprim@npm:^1.2.2":
   version: 1.4.1
   resolution: "jsprim@npm:1.4.1"
@@ -7646,27 +7557,6 @@ fsevents@~2.1.2:
     array-includes: ^3.1.1
     object.assign: ^4.1.1
   checksum: 189ef9aed8dae620376a3f164c7aac9caaa906e6ecc460f175b3910dadc28f472f0e8c171c3355f9c6a1fc448282926f3f3e42da993880d5a9d57408c03ed85a
-  languageName: node
-  linkType: hard
-
-"jwa@npm:^1.4.1":
-  version: 1.4.1
-  resolution: "jwa@npm:1.4.1"
-  dependencies:
-    buffer-equal-constant-time: 1.0.1
-    ecdsa-sig-formatter: 1.0.11
-    safe-buffer: ^5.0.1
-  checksum: e3a6234a3a33b0390c35cc7393890b1ca1bac22382755035ad252f6df9e1272dcf0ff0a717c7865657fc30e04b8d5ab07ea27e26f0763c60c557946963402752
-  languageName: node
-  linkType: hard
-
-"jws@npm:^3.2.2":
-  version: 3.2.2
-  resolution: "jws@npm:3.2.2"
-  dependencies:
-    jwa: ^1.4.1
-    safe-buffer: ^5.0.1
-  checksum: 3990b26ebb6f368bf6c53bf580cd327f207052adedeb7900dde665e143fff9ea5d96d0b4282e85a631a6e3af76ada281a1ccc450b1916d579d07e9d36b564a19
   languageName: node
   linkType: hard
 
@@ -7967,34 +7857,6 @@ fsevents@~2.1.2:
   languageName: node
   linkType: hard
 
-"lodash.includes@npm:^4.3.0":
-  version: 4.3.0
-  resolution: "lodash.includes@npm:4.3.0"
-  checksum: 20d6b1bf7841a4eb21bcb124641a1d5fb368e3c86fb8834d80149ec92caef67f3bf316405e4ec309591f0a83e461cebb7b43b2b57d00fd45d1eb3009fe13be97
-  languageName: node
-  linkType: hard
-
-"lodash.isboolean@npm:^3.0.3":
-  version: 3.0.3
-  resolution: "lodash.isboolean@npm:3.0.3"
-  checksum: e5b7a921f47759773266e66664e4a54f2438cc213fe336c5b96321d4328ebb2785e939bbcd07b29d5a20cdc6140d471abae1e94cdfb25937dc91ddc5150f41a0
-  languageName: node
-  linkType: hard
-
-"lodash.isinteger@npm:^4.0.4":
-  version: 4.0.4
-  resolution: "lodash.isinteger@npm:4.0.4"
-  checksum: a29551cc9aaaf24cc4fdd7ce1734c7a19c748c704f061ef079f6026dc9666ac10e8ae08e4f0cd3aeb6094e20be043a7402c72ce70cbae9ea6ecce67ad997332c
-  languageName: node
-  linkType: hard
-
-"lodash.isnumber@npm:^3.0.3":
-  version: 3.0.3
-  resolution: "lodash.isnumber@npm:3.0.3"
-  checksum: a33b10bf57dd27b32aac0bb4159d3f40db6b294095f42d7ff9f966a004932cdcc12417bf0750a9d3ac0c62690dd020d7d227b05ef486a8c9061963acf2ea3fad
-  languageName: node
-  linkType: hard
-
 "lodash.isplainobject@npm:^4.0.6":
   version: 4.0.6
   resolution: "lodash.isplainobject@npm:4.0.6"
@@ -8002,24 +7864,10 @@ fsevents@~2.1.2:
   languageName: node
   linkType: hard
 
-"lodash.isstring@npm:^4.0.1":
-  version: 4.0.1
-  resolution: "lodash.isstring@npm:4.0.1"
-  checksum: 20c46960b74fd63c27b534f1725cd4141ac19b35c7250affee37c8b7899b1a4c5e9820becfafe571a4d48cd4c86206ee03c2e93fe943dbeab82ddd5cab710540
-  languageName: node
-  linkType: hard
-
 "lodash.memoize@npm:4.x":
   version: 4.1.2
   resolution: "lodash.memoize@npm:4.1.2"
   checksum: 080c1095b7795b293a06078737550dc0c8138192cadbafb4e4b1303357d367ac589a1a570fad8de154175b008ca7b2b48d6a7f1755a143e13b764e20a7104080
-  languageName: node
-  linkType: hard
-
-"lodash.once@npm:^4.0.0":
-  version: 4.1.1
-  resolution: "lodash.once@npm:4.1.1"
-  checksum: 236e00ca5f20304fab5b38aa3aedb034959153dae6edf33d7f9b00406ced8f24ed232a74f1200505d9049165ceea2ce1256199e1683b0a25e9de89091d4b13c2
   languageName: node
   linkType: hard
 
