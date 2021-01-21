@@ -28,12 +28,37 @@ const server = http.createServer(app);
   const settings = settingsFactory({
     ownerResolver: () => '270fedda-81ba-4e5a-b3e1-098c155a0a33',
     settings: {
-      layout: [{
-        category: 'ui',
-        name: ['theme', 'fontSize'],
-      }],
+      measure: {
+        with: {
+          int: true,
+          defaultValue: 162,
+        },
+        height: {
+          enum: ['full', 'notfull'],
+          defaultValue: 'notfull',
+        },
+      },
+      ui: {
+        theme: {
+          enum: ['standard', 'standardDark'],
+          defaultValue: 'standard',
+        },
+        locale: {
+          enum: ['ru', 'en'],
+          defaultValue: 'ru',
+        },
+        drawer: {
+          bool: true,
+          defaultValue: true,
+        },
+        fontSize: {
+          int: true,
+          defaultValue: 12,
+        },
+      },
     },
-  })
+  });
+
 
   const schema = makeExecutableSchema({
     typeDefs: [

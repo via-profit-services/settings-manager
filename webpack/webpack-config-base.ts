@@ -34,7 +34,6 @@ const webpackBaseConfig: Configuration = {
     ...knexExternals,
     /^@via-profit-services\/core/,
     /^@via-profit-services\/knex/,
-    /^@via-profit-services\/accounts/,
     /^moment$/,
     /^moment-timezone$/,
     /^uuid$/,

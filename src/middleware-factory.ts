@@ -1,14 +1,12 @@
-import { Middleware, Node, ServerError } from '@via-profit-services/core';
-import type { SettingsMiddlewareFactory, SettingsNode } from '@via-profit-services/settings-manager';
+import { collateForDataloader, Middleware, ServerError } from '@via-profit-services/core';
+import type { SettingsMiddlewareFactory } from '@via-profit-services/settings-manager';
 import DataLoader from 'dataloader';
-import { v4 as uuidv4 } from 'uuid';
+import '@via-profit-services/knex';
 
-import staticResolvers from './resolvers';
 import schemaBuilder from './schema-builder';
-import staticTypeDefs from './schema.graphql';
 import SettingsManager from './SettingsManager';
 
-const settingsMiddlewareFactory: SettingsMiddlewareFactory = (configuration) => {
+const settingsMiddlewareFactory: SettingsMiddlewareFactory = async (configuration) => {
 
   const { settings, ownerResolver } = configuration;
   const pool: ReturnType<Middleware> = {
@@ -24,81 +22,46 @@ const settingsMiddlewareFactory: SettingsMiddlewareFactory = (configuration) => 
       return pool;
     }
 
+    // check knex dependencies
+    if (typeof context.knex === 'undefined') {
+      throw new ServerError(
+        '«@via-profit-services/knex» middleware is missing. If knex middleware is already connected, make sure that the connection order is correct: knex middleware must be connected before',
+      );
+    }
+
     pool.context = context;
 
     // Inject Settings service
-    const service = new SettingsManager({ context });
+    pool.context.services.settings = new SettingsManager({ context });
 
-    service.ownerResolver = ownerResolver;
+    // register owner resolver
+    pool.context.services.settings.ownerResolver = ownerResolver;
 
-    pool.context.services.settings = service;
+    // check default database
+    await pool.context.services.settings.writeDefaultSettings(settings);
 
-    pool.context.dataloader.settings = new DataLoader<
-      string,
-      Node<SettingsNode>
-    >(async (pseudoIds: string[]) => {
-    const nodes = await pool.context.services.settings.getSettingsByPseudoIds(pseudoIds);
+    // init pseudoIDs dataloader
+    pool.context.dataloader.settingsPseudos = new DataLoader(async (pseudoIds: string[]) => {
+      const nodes = await pool.context.services.settings.resolveSettingsByPsudoIDs(pseudoIds);
 
-    const batchSettings = pseudoIds.map((pseudoId) => {
-      const { category, group, name, owner } = service.getDataFromPseudoId(pseudoId);
-      const settingsList = nodes.filter((node) => node.category === category
-          && node.group === group
-          && node.name === name);
-
-      // try to search settings for specified owner
-      const settings = settingsList.find((s) => s.owner === (owner || null));
-
-      // if settings for specified owner not found
-      // will be created new settings record
-      if (!settings) {
-        const newSettings: SettingsNode = {
-          category,
-          group,
-          value: null,
-          createdAt: new Date(),
-          updatedAt: new Date(),
-          ...settingsList[0],
-          owner: owner || '',
-          comment: '',
-          id: uuidv4(),
-        };
-
-        if (!newSettings.category || !newSettings.group) {
-          throw new ServerError('SettingsManager. Invalid settings was passed', { newSettings });
-        }
-
-        if (!owner) {
-          throw new ServerError('SettingsManager. Check the global settings exist. Maybe you should to execute migrations for this', newSettings);
-        }
-
-        try {
-          service.createSettings(newSettings);
-        } catch (err) {
-          throw new ServerError('Failed to create new settings record', { err });
-        }
-
-        return newSettings;
-      }
-
-      return settings;
+      return collateForDataloader(pseudoIds, nodes);
     });
 
-    return batchSettings;
-  });
+    // init standard dataloader
+    pool.context.dataloader.settings = new DataLoader(async (ids: string[]) => {
+      const nodes = await pool.context.services.settings.getSettingsByIds(ids);
+
+      return collateForDataloader(ids, nodes);
+    });
 
     return pool;
   }
 
-  const composedResolvers = {
-    ...staticResolvers,
-    ...resolvers,
-  };
-
 
   return {
     middleware,
-    typeDefs: `${staticTypeDefs}\n\n${typeDefs}`,
-    resolvers: composedResolvers,
+    typeDefs,
+    resolvers,
   };
 }
 

@@ -1,32 +1,11 @@
-import { OutputFilter } from '@via-profit-services/core';
+import { BadRequestError, OutputFilter } from '@via-profit-services/core';
 import { convertWhereToKnex, convertOrderByToKnex, convertSearchToKnex } from '@via-profit-services/knex';
-import type { SettingsNode, SettingsParsed, SettingsCategory, SettingsServiceProps, OwnerResolverFunc } from '@via-profit-services/settings-manager';
+import type {
+  SettingsNode, SettingsParsed, SettingsServiceProps, SettingsTableModel,
+  SettingsTableModelResult, OwnerResolverFunc, SettingsMap,
+ } from '@via-profit-services/settings-manager';
 import moment from 'moment-timezone';
-
-
-interface SettingsTableModel {
-  readonly createdAt: string;
-  readonly updatedAt: string;
-  readonly id: string;
-  readonly owner: string;
-  readonly group: string;
-  readonly name: string;
-  readonly value: any | null;
-  readonly category: SettingsCategory;
-  readonly comment: string;
-}
-
-interface SettingsTableModelResult {
-  readonly createdAt: Date;
-  readonly updatedAt: Date;
-  readonly id: string;
-  readonly owner: string;
-  readonly group: string;
-  readonly name: string;
-  readonly value: any | null;
-  readonly category: SettingsCategory;
-  readonly comment: string;
-}
+import { v4 as uuidv4 } from 'uuid';
 
 
 class SettingsService {
@@ -72,23 +51,19 @@ class SettingsService {
   }
 
   public dataToPseudoId(data: SettingsParsed) {
-    const {
-      group, category, name, owner,
-    } = data;
+    const { category, name, owner } = data;
 
-    return [ group, category, name, owner ].join('|');
+    return [ category, name, owner ].join('|');
   }
 
   public getDataFromPseudoId(pseudoId: string): SettingsParsed {
     const [
-      group,
       category,
       name,
       owner,
     ] = pseudoId.split('|') as string[];
 
     return {
-      group,
       category,
       name,
       owner,
@@ -106,7 +81,6 @@ class SettingsService {
           const data = this.getDataFromPseudoId(pseudoId);
           builder.orWhere((orBuilder) => {
             orBuilder.where('category', '=', data.category);
-            orBuilder.where('group', '=', data.group);
             orBuilder.where('name', '=', data.name);
 
             orBuilder.andWhere((andBuilder) => {
@@ -125,16 +99,14 @@ class SettingsService {
     return settingsList;
   }
 
+  public async updateSettings(id: string, input: Partial<SettingsNode>): Promise<string> {
+    const { knex, timezone } = this.props.context;
 
-  public async updateSettings(id: string, settingsField: Partial<SettingsNode>): Promise<string> {
-    const {
-      knex, timezone,
-    } = this.props.context;
-
-    const data = {
-      ...settingsField,
+    const data: Partial<SettingsTableModel> = {
+      ...input,
       id,
-      value: JSON.stringify(settingsField.value),
+      value: JSON.stringify(input.value),
+      createdAt: input.createdAt ? moment.tz(input.createdAt, timezone).format() : undefined,
       updatedAt: moment.tz(timezone).format(),
     };
     const [affectedId]: string[] = await knex<Partial<SettingsTableModel>>('settings')
@@ -145,20 +117,23 @@ class SettingsService {
     return affectedId;
   }
 
-  public async createSettings(settingsField: Omit<SettingsNode, 'createdAt' | 'updatedAt'>): Promise<string> {
-    const {
-      knex, timezone,
-    } = this.props.context;
+  public async createSettings(input: Partial<SettingsNode>): Promise<string> {
+    const { knex, timezone } = this.props.context;
 
 
-    const data = {
-      ...settingsField,
+    const data: SettingsTableModel = {
+      ...input,
+      id: input.id ? input.id : uuidv4(),
       createdAt: moment.tz(timezone).format(),
       updatedAt: moment.tz(timezone).format(),
-      value: JSON.stringify(settingsField.value),
+      value: JSON.stringify(input.value),
+      owner: input.owner ? input.owner : null,
+      category: input.category ? input.category : '',
+      name: input.name ? input.name : '',
+      comment: typeof input.comment !== 'undefined' ? input.comment : null,
     };
 
-    const [affectedId]: string[] = await knex<Partial<SettingsTableModel>>('settings')
+    const [affectedId]: string[] = await knex<SettingsTableModel>('settings')
       .insert(data)
       .returning('id');
 
@@ -175,6 +150,84 @@ class SettingsService {
       .returning('id');
 
     return deletedId;
+  }
+
+  public async resolveSettingsByPsudoIDs(pseudoIds: string[]): Promise<SettingsNode[]> {
+
+    // const result: SettingsNode[] = [];
+
+    // try to load settings
+    const nodes = await this.getSettingsByPseudoIds(pseudoIds);
+
+    const result = pseudoIds.map((pseudoID) => {
+      const { category, name, owner } = this.getDataFromPseudoId(pseudoID);
+      const settingsList = nodes.filter((node) => node.category === category && node.name === name);
+      const settings = settingsList.find((s) => s.owner === (owner || null));
+      // result.push();
+      if (settings) {
+        return settings;
+      }
+
+      const newSettings: SettingsNode = {
+        category,
+        value: null,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        ...settingsList[0],
+        owner: owner || '',
+        comment: '',
+        id: uuidv4(),
+      };
+
+      if (!newSettings.category) {
+        throw new BadRequestError('SettingsManager. Invalid settings. Check the', { newSettings });
+      }
+
+      if (!owner) {
+        throw new BadRequestError('SettingsManager. Check the global settings exist. Maybe you should to execute migrations for this', newSettings);
+      }
+
+      try {
+        this.createSettings(newSettings);
+      } catch (err) {
+        throw new BadRequestError('Failed to create new settings record', { err });
+      }
+
+      return newSettings;
+    })
+
+
+    return result;
+  }
+
+  public async writeDefaultSettings(settingsMap: SettingsMap): Promise<void> {
+    const { context } = this.props;
+    const { knex, timezone } = context;
+
+    const settingsDefaultList: SettingsTableModel[] = [];
+
+    Object.entries(settingsMap).forEach(([category, namesMap]) => {
+      Object.entries(namesMap).forEach(([name, { defaultValue }]) => {
+        settingsDefaultList.push({
+          id: uuidv4(),
+          createdAt: moment.tz(timezone).format(),
+          updatedAt: moment.tz(timezone).format(),
+          owner: null,
+          category,
+          name,
+          value: JSON.stringify(defaultValue),
+          comment: '',
+        });
+      });
+    });
+
+
+    await knex.raw(`
+      ${knex('settings').insert(settingsDefaultList).toQuery()}
+      on conflict on constraint "settings_un" do update set
+      "value" = excluded."value",
+      "id" = excluded."id";
+    `);
   }
 }
 

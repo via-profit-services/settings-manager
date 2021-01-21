@@ -1,56 +1,136 @@
 declare module '@via-profit-services/settings-manager' {
   import { Middleware, Context, OutputFilter } from '@via-profit-services/core';
+  import { GraphQLFieldResolver } from 'graphql';
 
-  export interface MakeSchemaParams {
-    /** Group name */
-    [key: string]: Array<{
 
-      /** Settings category preset */
-      category: SettingsCategory;
-
-      /** Settings field name */
-      name: string | string[];
-
-      owner?: string;
-
-    }>;
-  }
 
   export interface Configuration {
-    settings: MakeSchemaParams;
+    settings: SettingsMap;
     ownerResolver: OwnerResolverFunc;
   }
 
-  export type SettingsCategory = 
-    | 'general'
-    | 'ui'
-    | 'contact'
-    | 'constraint'
-    | 'currency'
-    | 'size'
-    | 'label'
-    | 'other';
+ 
+  export type SettingsMapGroup = Record<string, SettingsMapParams>;
+  export type SettingsMap = Record<string, SettingsMapGroup>;
+  
+  
+  export type SettingsMapParams = 
+  | SettingsMapParamsEnum
+  | SettingsMapParamsString
+  | SettingsMapParamsInt
+  | SettingsMapParamsBool;
+
+  export type SettingsMapParamsEnum = {
+    enum: string[];
+    defaultValue: string;
+  };
+
+  export type SettingsMapParamsString = {
+    string: boolean;
+    defaultValue: string;
+  };
+
+  export type SettingsMapParamsInt = {
+    int: boolean;
+    defaultValue: number;
+  };
+
+  export type SettingsMapParamsBool = {
+    bool: boolean;
+    defaultValue: boolean;
+  };
+
+
+
+
+  export type Resolvers = {
+    Query: {
+      settings: GraphQLFieldResolver<unknown, Context>,
+    },
+    Mutation: {
+      settings: GraphQLFieldResolver<unknown, Context>
+    },
+    SettingsQuery: Record<string, GraphQLFieldResolver<unknown, Context>>,
+
+    SettingsMutation: {
+      set: GraphQLFieldResolver<unknown, Context, {
+        id?: string;
+        category: string;
+        name: string;
+        value: any;
+      }>;
+    },
+    [x: string]: {
+      [x: string]: GraphQLFieldResolver<unknown, Context>;
+    };
+  };
+
+  export interface SettingsValue {
+    id: string;
+    createdAt: Date;
+    updatedAt: Date;
+    owner: string;
+    value: string | number | boolean | null;
+  }
+
+  export type ValuesResolverParent = {
+    category: string;
+    name: string;
+  }
+
+  export type ValuesResolver = Record<keyof SettingsValue, GraphQLFieldResolver<ValuesResolverParent, Context>>;
+
+
+  export type SettingsMiddlewareFactory = (config: Configuration) => Promise<{
+    middleware: Middleware;
+    resolvers: Resolvers;
+    typeDefs: string;
+  }>;
+
+  export type SchemaBuilder = (settingsMap: SettingsMap) => {
+    typeDefs: string;
+    resolvers: Resolvers;
+  };
+
+
+
+
+  export type SettingsTableModel = {
+    readonly id: string;
+    readonly createdAt: string;
+    readonly updatedAt: string;
+    readonly owner: string;
+    readonly category: string;
+    readonly name: string;
+    readonly value: string | number | boolean | null;
+    readonly comment: string;
+  }
+
+  export type SettingsTableModelResult = {
+    readonly id: string;
+    readonly createdAt: Date;
+    readonly updatedAt: Date;
+    readonly owner: string;
+    readonly category: string;
+    readonly name: string;
+    readonly value: string | number | boolean | null;
+    readonly comment: string;
+  }
 
 
   export interface SettingsNode {
+    id: string;
     createdAt: Date;
     updatedAt: Date;
-    id: string;
     owner: string;
-    group: string;
+    category: string;
     name: string;
-    value: any | null;
-    category: SettingsCategory;
+    value: string | number | boolean | null;
     comment: string;
   }
 
-  export type SettingsMiddlewareFactory = (config: Configuration) => {
-    middleware: Middleware;
-    resolvers: any;
-    typeDefs: string;
-  };
 
-  export type SettingsParsed = Pick<SettingsNode, 'owner' | 'group' | 'name' | 'category'>;
+  export type SettingsParsed = Pick<SettingsNode, 'owner' | 'name' | 'category'>;
 
   /**
    * Settings Manager service constructor props
@@ -99,11 +179,15 @@ declare module '@via-profit-services/settings-manager' {
     /**
      * Create new settings record
      */
-    createSettings(settingsField: Omit<SettingsNode, 'createdAt' | 'updatedAt'>): Promise<string>;
+    createSettings(settingsField: Partial<SettingsNode>): Promise<string>;
     /**
      * Permanently remove settings record
      */
     deleteSettings(id: string): Promise<string>;
+
+    resolveSettingsByPsudoIDs(pseudoIds: string[]): Promise<SettingsNode[]>;
+
+    writeDefaultSettings(settingsMap: SettingsMap): Promise<void>;
 
 
   }
@@ -119,7 +203,11 @@ declare module '@via-profit-services/core' {
 
   interface DataLoaderCollection {
     /**
-     * Settings dataloader
+     * Settings dataloader by pseudo IDs
+     */
+    settingsPseudos: DataLoader<string, Node<SettingsNode>>;
+    /**
+     * Settings dataloader by IDs
      */
     settings: DataLoader<string, Node<SettingsNode>>;
   }

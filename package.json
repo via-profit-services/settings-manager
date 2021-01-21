@@ -28,7 +28,7 @@
         "migrate:latest": "yarn knex migrate:latest --knexfile ./.knex/knexfile.js",
         "migrate:up": "yarn knex migrate:up --knexfile ./.knex/knexfile.js",
         "migrate:down": "yarn knex migrate:down --knexfile ./.knex/knexfile.js",
-        "migrate:make": "yarn knex migrate:make --knexfile ./.knex/knexfile.js",
+        "migrate:make": "yarn knex migrate:make --migrations-directory ./src/database/migrations -x ts",
         "seed": "yarn knex seed:run --knexfile ./.knex/knexfile.js",
         "postversion": "git push --tags",
         "release:patch": "yarn version --patch",
