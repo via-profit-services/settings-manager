@@ -3,7 +3,7 @@ module.exports =
 /******/ 	"use strict";
 /******/ 	var __webpack_modules__ = ({
 
-/***/ 503:
+/***/ 244:
 /***/ (function(__unused_webpack_module, exports) {
 
 
@@ -21,70 +21,40 @@ exports.down = exports.up = void 0;
 function up(knex) {
     return __awaiter(this, void 0, void 0, function* () {
         return knex.raw(`
-    DROP TABLE IF EXISTS roles CASCADE;
+    
+    drop table if exists "settings";
+    
+    drop type if exists "settingsCategory";
 
-    CREATE TABLE roles (
+
+    create type "settingsCategory" as  enum (
+      'general',
+      'ui',
+      'contact',
+      'currency',
+      'constraint',
+      'size',
+      'label',
+      'other'
+    );
+
+    CREATE TABLE "settings" (
+      "id" uuid NOT NULL,
+      "createdAt" timestamptz NOT NULL DEFAULT now(),
+      "updatedAt" timestamptz NOT NULL DEFAULT now(),
+      "group" varchar(50) NOT NULL,
+      "category" "settingsCategory" NOT NULL DEFAULT 'other'::"settingsCategory",
+      "owner" uuid NULL,
       "name" varchar(100) NOT NULL,
-      "description" text NULL,
-      CONSTRAINT roles_pk PRIMARY KEY (name)
-    );
-
-    DROP TABLE IF EXISTS "privileges" CASCADE;
-      CREATE TABLE "privileges" (
-      "name" varchar(100) NOT NULL,
-      "description" text NULL,
-      CONSTRAINT privileges_pk PRIMARY KEY (name)
-    );
-
-    DROP TABLE IF EXISTS "roles2privileges" CASCADE;
-    CREATE TABLE "roles2privileges" (
-      "role" varchar(100) NOT NULL,
-      "privilege" varchar(100) NOT NULL,
-      CONSTRAINT "roles2privileges_un" UNIQUE (role, privilege)
-    );
-
-    ALTER TABLE "roles2privileges" ADD CONSTRAINT "roles2privileges_privilege_fk" FOREIGN KEY (privilege) REFERENCES privileges(name) ON DELETE CASCADE;
-    ALTER TABLE "roles2privileges" ADD CONSTRAINT "roles2privileges_role_fk" FOREIGN KEY (role) REFERENCES roles(name) ON DELETE CASCADE;
-  
-
-    DROP TYPE IF EXISTS "permissionsType";
-    CREATE TYPE "permissionsType" AS ENUM (
-      'grant',
-      'restrict'
+      "value" jsonb NOT NULL DEFAULT '{}'::jsonb,
+      "comment" text NULL,
+      CONSTRAINT settings_pk PRIMARY KEY (id),
+      CONSTRAINT settings_un UNIQUE ("group", "category", "name", "owner")
     );
     
-    DROP TABLE IF EXISTS "permissions" CASCADE;
-    CREATE TABLE "permissions" (
-      "typeName" varchar(100) NOT NULL,
-      "fieldName" varchar(100) NOT NULL,
-      "type" "permissionsType" NOT NULL DEFAULT 'grant'::"permissionsType",
-      "privilege" varchar(100) NOT NULL,
-      CONSTRAINT permissions_un UNIQUE ("typeName","fieldName",privilege)
-    );
-
-    ALTER TABLE "permissions" ADD CONSTRAINT "permissions_privilege_fk" FOREIGN KEY (privilege) REFERENCES privileges(name) ON DELETE CASCADE;
-
-    
-    -- insert default roles set
-    insert into roles
-      ("name", "description")
-    values 
-      ('viewer', 'Used as viewer/reader. Accounts have this role can make request only to display data, not mutate.'),
-      ('developer', 'Accounts have this role can make all requests without limits.'),
-      ('administrator', 'Accounts have this role can make all requests without limits.');
-
-    -- insert privileges
-    insert into privileges
-      ("name", "description")
-    values
-      ('*', 'Unlimited access');
-
-    -- insert roles2privileges
-    insert into "roles2privileges"
-      ("role", "privilege")
-    values
-      ('developer', '*'),
-      ('administrator', '*');
+    comment on column "settings"."group" is 'Usually, the module name is used as the group name';
+    comment on column "settings"."category" is 'Just the name of the settings category, for example, for a catalog - items;category;orders';
+    comment on column "settings"."comment" is 'Just comment of this settings field for internal usage';
   `);
     });
 }
@@ -92,10 +62,8 @@ exports.up = up;
 function down(knex) {
     return __awaiter(this, void 0, void 0, function* () {
         return knex.raw(`
-    DROP TABLE IF EXISTS "permissions" CASCADE;
-    DROP TABLE IF EXISTS "roles2privileges" CASCADE;
-    DROP TABLE IF EXISTS "privileges" CASCADE;
-    DROP TABLE IF EXISTS "roles" CASCADE;
+    drop table if exists "settings";
+    drop type if exists "settingsCategory";
   `);
     });
 }
@@ -133,6 +101,6 @@ exports.down = down;
 /******/ 	// module exports must be returned from runtime so entry inlining is disabled
 /******/ 	// startup
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(503);
+/******/ 	return __webpack_require__(244);
 /******/ })()
 ;
