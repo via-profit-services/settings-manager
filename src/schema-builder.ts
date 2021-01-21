@@ -1,4 +1,5 @@
-import { ServerError } from '@via-profit-services/core';
+/* eslint-disable arrow-body-style */
+import { BadRequestError, ServerError } from '@via-profit-services/core';
 import type { SchemaBuilder, ValuesResolver, Resolvers } from '@via-profit-services/settings-manager';
 
 const schemaBuilder: SchemaBuilder = (settingsMap) => {
@@ -13,27 +14,24 @@ const schemaBuilder: SchemaBuilder = (settingsMap) => {
     }, {
       get: (_target, prop: keyof ValuesResolver) => {
 
-        const resolver: ValuesResolver[keyof ValuesResolver] = async (parent) => {
+        const resolver: ValuesResolver[keyof ValuesResolver] = async (parent, _args, context) => {
           const { name, category } = parent;
+          const { services, dataloader } = context;
 
-          const se: Record<string, any> = {
-            id: '8ac7f540-ec73-40f4-9d9c-bbf42ef85517',
-            owner: '3c9ee90d-bba4-423f-aa65-6883bc8abf45',
-            createdAt: new Date(),
-            updatedAt: new Date(),
-            value: '',
-          };
+          const owner = services.settings.ownerResolver(context);
+          const pseudoId = services.settings.dataToPseudoId({ owner, name, category });
+          const settingsData = await dataloader.settingsPseudos.load(pseudoId);
 
-          if (name === 'theme' && category === 'ui') {
-            se.value = 'standard';
+
+          if (typeof settingsData === 'undefined') {
+            throw new BadRequestError('SettingsManager. Settings of this params not exists', { parent });
           }
 
-          if (name === 'drawer' && category === 'ui') {
-            se.value = true;
+          if (typeof settingsData[prop] === 'undefined') {
+            return null;
           }
 
-          return se[prop];
-
+          return settingsData[prop];
         }
 
         return resolver;
@@ -53,11 +51,51 @@ const schemaBuilder: SchemaBuilder = (settingsMap) => {
     SettingsValueString: valueResolver,
     SettingsMutation: {
       set: async (_parent, args, context) => {
+
         const { services, dataloader } = context;
         const { name, value, category, id } = args;
+        const cap = (str: string) => str.charAt(0).toUpperCase() + str.slice(1);
 
         const owner = services.settings.ownerResolver(context);
         const pseudoId = services.settings.dataToPseudoId({ category, name, owner });
+
+        // check to valid settings value
+        const settingsParam = settingsMap?.[category]?.[name] || false;
+        if (!settingsParam) {
+          throw new BadRequestError('SettingsManager. Invalid value');
+        }
+
+        if ('bool' in settingsParam && typeof value !== 'boolean') {
+          throw new BadRequestError(
+            `SettingsManager. Invalid value for type Settings${cap(category)}${cap(name)}Boolean. Expected «boolean», but got «${typeof value}»`,
+          );
+        }
+
+        if ('int' in settingsParam && typeof value !== 'number') {
+          throw new BadRequestError(
+            `SettingsManager. Invalid value for Settings${cap(category)}${cap(name)}Int. Expected «number», but got «${typeof value}»`,
+          );
+        }
+
+        if ('string' in settingsParam && typeof value !== 'string') {
+          throw new BadRequestError(
+            `SettingsManager. Invalid value for Settings${cap(category)}${cap(name)}String. Expected «string», but got «${typeof value}»`,
+          );
+        }
+
+        if ('enum' in settingsParam && typeof value !== typeof settingsParam.enum[0]) {
+
+          throw new BadRequestError(
+            `SettingsManager. Invalid value for Settings${cap(category)}${cap(name)}. Expected «${typeof settingsParam.enum[0]}», but got «${typeof value}»`,
+          );
+        }
+
+        if ('enum' in settingsParam && !settingsParam.enum.includes(value)) {
+
+          throw new BadRequestError(
+            `SettingsManager. Invalid value for Settings${cap(category)}${cap(name)}. Expected one of [${settingsParam.enum.join('; ')}], but got «${value}»`,
+          );
+        }
 
         dataloader.settings.clear(pseudoId);
 
@@ -95,9 +133,16 @@ const schemaBuilder: SchemaBuilder = (settingsMap) => {
           }
         }
 
+        return true;
+
       },
     },
   };
+
+  const categoriesList = Object.keys(settingsMap);
+  const namesList = Object.entries(settingsMap).map(([_category, namesMap]) => {
+    return Object.keys(namesMap);
+  })
 
   const typeDefs = `
 
@@ -141,12 +186,12 @@ const schemaBuilder: SchemaBuilder = (settingsMap) => {
         """
         Settings category
         """
-        category: String!
+        category: SettingsCategory!
 
         """
         Settings field name
         """
-        name: String!
+        name: SettingsName!
 
         """
         Settings value
@@ -177,6 +222,14 @@ const schemaBuilder: SchemaBuilder = (settingsMap) => {
       updatedAt: DateTime!
       owner: ID
       value: Boolean!
+    }
+
+    enum SettingsCategory {
+      ${categoriesList.join(' ')}
+    }
+
+    enum SettingsName {
+      ${namesList.join(' ')}
     }
 
     type SettingsQuery {

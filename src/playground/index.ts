@@ -25,7 +25,7 @@ const server = http.createServer(app);
     },
   });
 
-  const settings = settingsFactory({
+  const settings = await settingsFactory({
     ownerResolver: () => '270fedda-81ba-4e5a-b3e1-098c155a0a33',
     settings: {
       measure: {

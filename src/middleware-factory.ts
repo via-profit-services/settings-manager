@@ -44,7 +44,8 @@ const settingsMiddlewareFactory: SettingsMiddlewareFactory = async (configuratio
     pool.context.dataloader.settingsPseudos = new DataLoader(async (pseudoIds: string[]) => {
       const nodes = await pool.context.services.settings.resolveSettingsByPsudoIDs(pseudoIds);
 
-      return collateForDataloader(pseudoIds, nodes);
+      return pseudoIds.map((pseodoID) => nodes
+        .find((node) => pool.context.services.settings.dataToPseudoId(node) === pseodoID));
     });
 
     // init standard dataloader

@@ -1,4 +1,4 @@
-import { BadRequestError, OutputFilter } from '@via-profit-services/core';
+import { OutputFilter } from '@via-profit-services/core';
 import { convertWhereToKnex, convertOrderByToKnex, convertSearchToKnex } from '@via-profit-services/knex';
 import type {
   SettingsNode, SettingsParsed, SettingsServiceProps, SettingsTableModel,
@@ -153,17 +153,13 @@ class SettingsService {
   }
 
   public async resolveSettingsByPsudoIDs(pseudoIds: string[]): Promise<SettingsNode[]> {
-
-    // const result: SettingsNode[] = [];
-
-    // try to load settings
     const nodes = await this.getSettingsByPseudoIds(pseudoIds);
 
-    const result = pseudoIds.map((pseudoID) => {
+    const resolveSettings = async (pseudoID: string) => {
       const { category, name, owner } = this.getDataFromPseudoId(pseudoID);
       const settingsList = nodes.filter((node) => node.category === category && node.name === name);
       const settings = settingsList.find((s) => s.owner === (owner || null));
-      // result.push();
+
       if (settings) {
         return settings;
       }
@@ -175,27 +171,17 @@ class SettingsService {
         updatedAt: new Date(),
         ...settingsList[0],
         owner: owner || '',
+        name,
         comment: '',
         id: uuidv4(),
       };
 
-      if (!newSettings.category) {
-        throw new BadRequestError('SettingsManager. Invalid settings. Check the', { newSettings });
-      }
-
-      if (!owner) {
-        throw new BadRequestError('SettingsManager. Check the global settings exist. Maybe you should to execute migrations for this', newSettings);
-      }
-
-      try {
-        this.createSettings(newSettings);
-      } catch (err) {
-        throw new BadRequestError('Failed to create new settings record', { err });
-      }
+      await this.createSettings(newSettings);
 
       return newSettings;
-    })
+    }
 
+    const result = Promise.all(pseudoIds.map(resolveSettings));
 
     return result;
   }
@@ -221,13 +207,10 @@ class SettingsService {
       });
     });
 
-
-    await knex.raw(`
-      ${knex('settings').insert(settingsDefaultList).toQuery()}
-      on conflict on constraint "settings_un" do update set
-      "value" = excluded."value",
-      "id" = excluded."id";
-    `);
+    await knex.transaction(async (trx) => {
+      await knex('settings').del().whereNull('owner').transacting(trx);
+      await knex('settings').insert(settingsDefaultList).transacting(trx);
+    });
   }
 }
 
