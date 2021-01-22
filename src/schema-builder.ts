@@ -97,7 +97,7 @@ const schemaBuilder: SchemaBuilder = (settingsMap) => {
           );
         }
 
-        dataloader.settings.clear(pseudoId);
+        dataloader.settingsPseudos.clear(pseudoId);
 
         // get old settings if exist
         const [settingsField] = await services.settings.getSettings({
@@ -132,6 +132,7 @@ const schemaBuilder: SchemaBuilder = (settingsMap) => {
             throw new ServerError('SettingsManager. Failed to create settings', { err });
           }
         }
+
 
         const response = await dataloader.settingsPseudos.load(pseudoId);
 
