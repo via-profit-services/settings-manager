@@ -1,9 +1,10 @@
 /* eslint-disable arrow-body-style */
 import { BadRequestError, ServerError } from '@via-profit-services/core';
-import type { SchemaBuilder, ValuesResolver, Resolvers } from '@via-profit-services/settings-manager';
+import type { SchemaBuilder, ValuesResolver, Resolvers, MutationResolverFactory } from '@via-profit-services/settings-manager';
+
+import { capitalize, getTypeValueName, getType } from './utils/helpers';
 
 const schemaBuilder: SchemaBuilder = (settingsMap) => {
-  const capitalize = (str: string) => str.charAt(0).toUpperCase() + str.slice(1);
 
   const valueResolver = new Proxy<ValuesResolver>({
     id: () => ({}),
@@ -38,6 +39,98 @@ const schemaBuilder: SchemaBuilder = (settingsMap) => {
       },
   });
 
+  const getMutationResolver: MutationResolverFactory = (params) => async (_p, args, context) => {
+    const { services, dataloader } = context;
+    const { name, category } = params;
+    const { value } = args;
+    const cap = (str: string) => str.charAt(0).toUpperCase() + str.slice(1);
+
+    const owner = services.settings.ownerResolver(context);
+    const pseudoId = services.settings.dataToPseudoId({ category, name, owner });
+    const valueTypeName = getTypeValueName({ settingsMap, category, name });
+
+    // check to valid settings value
+    const settingsParam = settingsMap?.[category]?.[name] || false;
+    if (!settingsParam) {
+      throw new BadRequestError('SettingsManager. Invalid value');
+    }
+
+    if ('bool' in settingsParam && typeof value !== 'boolean') {
+      throw new BadRequestError(
+        `SettingsManager. Invalid value for type Settings${cap(category)}${cap(name)}Boolean. Expected «boolean», but got «${typeof value}»`,
+      );
+    }
+
+    if ('int' in settingsParam && typeof value !== 'number') {
+      throw new BadRequestError(
+        `SettingsManager. Invalid value for Settings${cap(category)}${cap(name)}Int. Expected «number», but got «${typeof value}»`,
+      );
+    }
+
+    if ('string' in settingsParam && typeof value !== 'string') {
+      throw new BadRequestError(
+        `SettingsManager. Invalid value for Settings${cap(category)}${cap(name)}String. Expected «string», but got «${typeof value}»`,
+      );
+    }
+
+    if ('enum' in settingsParam && typeof value !== typeof settingsParam.enum[0]) {
+
+      throw new BadRequestError(
+        `SettingsManager. Invalid value for Settings${cap(category)}${cap(name)}. Expected «${typeof settingsParam.enum[0]}», but got «${typeof value}»`,
+      );
+    }
+
+    if ('enum' in settingsParam && !settingsParam.enum.includes(String(value))) {
+
+      throw new BadRequestError(
+        `SettingsManager. Invalid value for Settings${cap(category)}${cap(name)}. Expected one of [${settingsParam.enum.join('; ')}], but got «${value}»`,
+      );
+    }
+
+    dataloader.settingsPseudos.clear(pseudoId);
+
+    // get old settings if exist
+    const [settingsField] = await services.settings.getSettings({
+      limit: 1,
+      where: [
+        ['category', '=', category],
+        ['name', '=', name],
+        ['owner', owner ? '=' : 'is null', owner],
+      ],
+    });
+
+    // update settings
+    if (settingsField) {
+      try {
+        await services.settings.updateSettings(settingsField.id, { value });
+      } catch (err) {
+        throw new ServerError('SettingsManager. Failed to update settings', { err });
+      }
+    }
+
+    // create new settings
+    if (!settingsField) {
+      try {
+        await services.settings.createSettings({
+          owner: owner || null,
+          category,
+          name,
+          value,
+        });
+      } catch (err) {
+        throw new ServerError('SettingsManager. Failed to create settings', { err });
+      }
+    }
+
+
+    const response = await dataloader.settingsPseudos.load(pseudoId);
+
+    return {
+      __typename: valueTypeName,
+      ...response,
+    };
+  }
+
   const resolvers: Resolvers = {
     Query: {
       settings: () => ({}),
@@ -49,96 +142,7 @@ const schemaBuilder: SchemaBuilder = (settingsMap) => {
     SettingsValueBoolean: valueResolver,
     SettingsValueInt: valueResolver,
     SettingsValueString: valueResolver,
-    SettingsMutation: {
-      set: async (_parent, args, context) => {
-
-        const { services, dataloader } = context;
-        const { name, value, category, id } = args;
-        const cap = (str: string) => str.charAt(0).toUpperCase() + str.slice(1);
-
-        const owner = services.settings.ownerResolver(context);
-        const pseudoId = services.settings.dataToPseudoId({ category, name, owner });
-
-        // check to valid settings value
-        const settingsParam = settingsMap?.[category]?.[name] || false;
-        if (!settingsParam) {
-          throw new BadRequestError('SettingsManager. Invalid value');
-        }
-
-        if ('bool' in settingsParam && typeof value !== 'boolean') {
-          throw new BadRequestError(
-            `SettingsManager. Invalid value for type Settings${cap(category)}${cap(name)}Boolean. Expected «boolean», but got «${typeof value}»`,
-          );
-        }
-
-        if ('int' in settingsParam && typeof value !== 'number') {
-          throw new BadRequestError(
-            `SettingsManager. Invalid value for Settings${cap(category)}${cap(name)}Int. Expected «number», but got «${typeof value}»`,
-          );
-        }
-
-        if ('string' in settingsParam && typeof value !== 'string') {
-          throw new BadRequestError(
-            `SettingsManager. Invalid value for Settings${cap(category)}${cap(name)}String. Expected «string», but got «${typeof value}»`,
-          );
-        }
-
-        if ('enum' in settingsParam && typeof value !== typeof settingsParam.enum[0]) {
-
-          throw new BadRequestError(
-            `SettingsManager. Invalid value for Settings${cap(category)}${cap(name)}. Expected «${typeof settingsParam.enum[0]}», but got «${typeof value}»`,
-          );
-        }
-
-        if ('enum' in settingsParam && !settingsParam.enum.includes(value)) {
-
-          throw new BadRequestError(
-            `SettingsManager. Invalid value for Settings${cap(category)}${cap(name)}. Expected one of [${settingsParam.enum.join('; ')}], but got «${value}»`,
-          );
-        }
-
-        dataloader.settingsPseudos.clear(pseudoId);
-
-        // get old settings if exist
-        const [settingsField] = await services.settings.getSettings({
-          limit: 1,
-          where: [
-            ['category', '=', category],
-            ['name', '=', name],
-            ['owner', owner ? '=' : 'is null', owner],
-          ],
-        });
-
-        // update settings
-        if (settingsField) {
-          try {
-            await services.settings.updateSettings(settingsField.id, { value });
-          } catch (err) {
-            throw new ServerError('SettingsManager. Failed to update settings', { err });
-          }
-        }
-
-        // create new settings
-        if (!settingsField) {
-          try {
-            await services.settings.createSettings({
-              id,
-              owner: owner || null,
-              category,
-              name,
-              value,
-            });
-          } catch (err) {
-            throw new ServerError('SettingsManager. Failed to create settings', { err });
-          }
-        }
-
-
-        const response = await dataloader.settingsPseudos.load(pseudoId);
-
-        return response;
-      },
-    },
+    SettingsMutation: {},
   };
 
   const categoriesList = Object.keys(settingsMap);
@@ -173,33 +177,6 @@ const schemaBuilder: SchemaBuilder = (settingsMap) => {
       updatedAt: DateTime!
 
       owner: ID
-    }
-
-    type SettingsMutation {
-      """
-      Set single settings field
-      """
-      set(
-        """
-        You may provide custom ID of this record
-        """
-        id: ID
-        
-        """
-        Settings category
-        """
-        category: SettingsCategory!
-
-        """
-        Settings field name
-        """
-        name: SettingsName!
-
-        """
-        Settings value
-        """
-        value: JSON!
-      ): SettingsSetResponse!
     }
 
     type SettingsSetResponse {
@@ -244,88 +221,90 @@ const schemaBuilder: SchemaBuilder = (settingsMap) => {
         resolvers.SettingsQuery[category] = () => ({});
 
         return (`
-          ${category}: Settings${capitalize(category)}!
+          ${category}: Settings${capitalize(category)}Query!
+        `)
+      })}
+    }
+    type SettingsMutation {
+      ${Object.keys(settingsMap).map((category) => {
+        resolvers.SettingsMutation[category] = () => ({ category });
+
+        return (`
+          ${category}: Settings${capitalize(category)}Mutation!
         `)
       })}
     }
 
+
+
     ${Object.entries(settingsMap).map(([category, namesMap]) => (`
 
-      type Settings${capitalize(category)} {
-        ${Object.entries(namesMap).map(([name, params]) => {
+      """${capitalize(category)} query collection"""
+      type Settings${capitalize(category)}Query {
+        ${Object.entries(namesMap).map(([name]) => {
 
-          let valueTypeName = '';
-
-          if ('bool' in params) {
-            valueTypeName = 'SettingsValueBoolean';
-          }
-
-          if ('string' in params) {
-            valueTypeName = 'SettingsValueString';
-          }
-
-          if ('int' in params) {
-            valueTypeName = 'SettingsValueInt';
-          }
-
-          if ('enum' in params) {
-            valueTypeName = `Settings${capitalize(category)}${capitalize(name)}`;
-          }
-
-          resolvers[`Settings${capitalize(category)}`] = {
-            ...resolvers[`Settings${capitalize(category)}`],
+          resolvers[`Settings${capitalize(category)}Query`] = {
+            ...resolvers[`Settings${capitalize(category)}Query`],
             [name]: () => ({ name, category }),
           };
 
           return (`
-            ${name}: ${valueTypeName}!
+            """${capitalize(category)} ${name} settings"""
+            ${name}: Settings${capitalize(category, name)}!
+          `)
+        })}
+      }
+
+
+
+      type Settings${capitalize(category)}Mutation {
+        ${Object.entries(namesMap).map(([name]) => {
+
+          const inputType = getType({ settingsMap, category, name });
+
+          resolvers[`Settings${capitalize(category)}Mutation`] = {
+            ...resolvers[`Settings${capitalize(category)}Mutation`],
+            [name]: getMutationResolver({ name, category }),
+          };
+
+          return (`
+            ${name}(
+              value: ${inputType}
+            ): Settings${capitalize(category, name)}!
           `)
         })}
       }
 
       ${Object.entries(namesMap).map(([name, params]) => {
 
-        let valueTypeName = '';
-        let valueType = '';
-
-        if ('bool' in params) {
-          valueTypeName = 'SettingsValueBoolean';
-        }
-
-        if ('string' in params) {
-          valueTypeName = 'SettingsValueString';
-        }
-
-        if ('int' in params) {
-          valueTypeName = 'SettingsValueInt';
-        }
+        const valueTypeName = getTypeValueName({ settingsMap, category, name });
 
         if ('enum' in params) {
-          valueTypeName = `Settings${capitalize(category)}${capitalize(name)}Variant`;
-          resolvers[`Settings${capitalize(category)}${capitalize(name)}`] = valueResolver;
-          valueType = `
+          resolvers[`Settings${capitalize(category, name)}`] = valueResolver;
+        }
+
+
+        return `
+          type Settings${capitalize(category, name)} implements SettingsNode {
+            id: ID!
+            createdAt: DateTime!
+            updatedAt: DateTime!
+            owner: ID
+            value: ${valueTypeName}!
+          } 
+
+          ${('enum' in params) ? (`
             enum ${valueTypeName} {
               ${params.enum.join(' ')}
             }
-
-            type Settings${capitalize(category)}${capitalize(name)} implements SettingsNode {
-              id: ID!
-              createdAt: DateTime!
-              updatedAt: DateTime!
-              owner: ID
-              value: ${valueTypeName}!
-            } 
-          `;
-        }
-
-        return `
-          ${valueType}
+          `) : ''}
           
         `;
       })}
 
     `))}
   `.replace(/,\n/gmi, '');
+
 
   return {
     typeDefs,

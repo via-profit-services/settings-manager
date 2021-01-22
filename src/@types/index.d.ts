@@ -51,15 +51,7 @@ declare module '@via-profit-services/settings-manager' {
       settings: GraphQLFieldResolver<unknown, Context>
     },
     SettingsQuery: Record<string, GraphQLFieldResolver<unknown, Context>>,
-
-    SettingsMutation: {
-      set: GraphQLFieldResolver<unknown, Context, {
-        id?: string;
-        category: string;
-        name: string;
-        value: any;
-      }>;
-    },
+    SettingsMutation: Record<string, GraphQLFieldResolver<unknown, Context>>,
     [x: string]: {
       [x: string]: GraphQLFieldResolver<unknown, Context>;
     };
@@ -73,13 +65,21 @@ declare module '@via-profit-services/settings-manager' {
     value: string | number | boolean | null;
   }
 
-  export type ValuesResolverParent = {
+ 
+
+  export type ValuesResolver = Record<keyof SettingsValue, GraphQLFieldResolver<{
     category: string;
     name: string;
-  }
+  }, Context>>;
 
-  export type ValuesResolver = Record<keyof SettingsValue, GraphQLFieldResolver<ValuesResolverParent, Context>>;
+  export type MutationResolver = GraphQLFieldResolver<unknown, Context, {
+    value: string | number | boolean;
+  }>;
 
+  export type MutationResolverFactory = (props: {
+    category: string;
+    name: string;
+  }) => MutationResolver;
 
   export type SettingsMiddlewareFactory = (config: Configuration) => Promise<{
     middleware: Middleware;
