@@ -28,33 +28,23 @@ const server = http.createServer(app);
   const settings = await settingsFactory({
     ownerResolver: () => '270fedda-81ba-4e5a-b3e1-098c155a0a33',
     settings: {
-      // measure: {
-      //   with: {
-      //     int: true,
-      //     defaultValue: 162,
-      //   },
-      //   height: {
-      //     enum: ['full', 'notfull'],
-      //     defaultValue: 'notfull',
-      //   },
-      // },
       ui: {
         theme: {
           enum: ['standard', 'standardDark'],
           defaultValue: 'standard',
         },
-        // locale: {
-        //   enum: ['ru', 'en'],
-        //   defaultValue: 'ru',
-        // },
+        locale: {
+          enum: ['ru', 'en', 'fr'],
+          defaultValue: 'fr',
+        },
         drawer: {
           bool: true,
           defaultValue: true,
         },
-        // fontSize: {
-        //   int: true,
-        //   defaultValue: 12,
-        // },
+        fontSize: {
+          int: true,
+          defaultValue: 12,
+        },
       },
     },
   });

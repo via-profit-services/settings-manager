@@ -44,14 +44,6 @@ declare module '@via-profit-services/settings-manager' {
 
 
   export type Resolvers = {
-    Query: {
-      settings: GraphQLFieldResolver<unknown, Context>,
-    },
-    Mutation: {
-      settings: GraphQLFieldResolver<unknown, Context>
-    },
-    SettingsQuery: Record<string, GraphQLFieldResolver<unknown, Context>>,
-    SettingsMutation: Record<string, GraphQLFieldResolver<unknown, Context>>,
     [x: string]: {
       [x: string]: GraphQLFieldResolver<unknown, Context>;
     };
@@ -65,6 +57,42 @@ declare module '@via-profit-services/settings-manager' {
     value: string | number | boolean | null;
   }
 
+
+  export type SchemaBuilderParams = {
+    query: {
+      categories: Array<{
+        name: string;
+        type: string;
+      }>;
+      names: Array<{
+        name: string;
+        category: string;
+        type: string;
+        value?: string;
+      }>;
+      enums: Array<{
+        type: string;
+        variants: string[];
+      }>;
+    }
+    mutation: {
+      categories: Array<{
+        name: string;
+        type: string;
+      }>;
+      names: Array<{
+        category: string;
+        name: string;
+        type: string;
+        input: string;
+        return: string;
+      }>;
+    }
+  }
+
+
+
+
  
 
   export type ValuesResolver = Record<keyof SettingsValue, GraphQLFieldResolver<{
@@ -72,7 +100,9 @@ declare module '@via-profit-services/settings-manager' {
     name: string;
   }, Context>>;
 
-  export type MutationResolver = GraphQLFieldResolver<unknown, Context, {
+  export type MutationResolver = GraphQLFieldResolver<{
+    category: string;
+  }, Context, {
     value: string | number | boolean;
   }>;
 
