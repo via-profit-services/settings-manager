@@ -133,8 +133,9 @@ const schemaBuilder: SchemaBuilder = (settingsMap) => {
           }
         }
 
-        return true;
+        const response = await dataloader.settingsPseudos.load(pseudoId);
 
+        return response;
       },
     },
   };
@@ -197,7 +198,12 @@ const schemaBuilder: SchemaBuilder = (settingsMap) => {
         Settings value
         """
         value: JSON!
-      ): Boolean!
+      ): SettingsSetResponse!
+    }
+
+    type SettingsSetResponse {
+      id: ID!
+      value: String!
     }
 
     type SettingsValueInt implements SettingsNode {
