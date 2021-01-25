@@ -21,6 +21,7 @@ exports.down = exports.up = void 0;
 function up(knex) {
     return __awaiter(this, void 0, void 0, function* () {
         return knex.raw(`
+    truncate table "settings" cascade;
     alter table "settings" drop constraint "settings_un";
     alter table "settings" alter column "category" type varchar(100) using "category"::text;
     alter table "settings" alter column "category" drop default;
@@ -34,6 +35,7 @@ exports.up = up;
 function down(knex) {
     return __awaiter(this, void 0, void 0, function* () {
         return knex.raw(`
+    alter table "settings" drop constraint "settings_un";
     alter table "settings" add column "group" varchar(50) NULL;
     comment on column "settings"."group" is 'Usually, the module name is used as the group name';
     create type "settingsCategory" as  enum (
