@@ -16,6 +16,7 @@ export async function up(knex: Knex): Promise<void> {
 
 export async function down(knex: Knex): Promise<void> {
     return knex.raw(`
+    alter table "settings" drop constraint "settings_un";
     alter table "settings" add column "group" varchar(50) NULL;
     comment on column "settings"."group" is 'Usually, the module name is used as the group name';
     create type "settingsCategory" as  enum (
