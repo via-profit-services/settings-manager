@@ -1,5 +1,4 @@
-/* eslint-disable import/no-extraneous-dependencies */
-import { Knex } from '@via-profit-services/core';
+import type Knex from 'knex';
 
 
 export async function up(knex: Knex): Promise<any> {
