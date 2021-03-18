@@ -1091,9 +1091,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@via-profit-services/core@file://home/dhs/Projects/@via-profit-services/core/package-1.0.0-rc.3.tgz::locator=%40via-profit-services%2Fsettings-manager%40workspace%3A.":
-  version: 1.0.0-rc.3
-  resolution: "@via-profit-services/core@file://home/dhs/Projects/@via-profit-services/core/package-1.0.0-rc.3.tgz::locator=%40via-profit-services%2Fsettings-manager%40workspace%3A."
+"@via-profit-services/core@npm:^1.0.5":
+  version: 1.0.5
+  resolution: "@via-profit-services/core@npm:1.0.5"
   dependencies:
     bufferutil: ^4.0.2
     content-type: ^1.0.4
@@ -1112,7 +1112,7 @@ __metadata:
       optional: true
     utf-8-validate:
       optional: true
-  checksum: d3a8c11d96d4a992e1bfedff501934abd4f21dfba4e48d6dce5143afca77b7c9c0d369a0d7458ed1b2bc4ecd47c1856cbdf74f2d5458c3618a98d5be25e03b7c
+  checksum: 70166fa0c9d99336224af96b3d451a2da715988a02208858bf176ab7cfcba9762e9b585bf010c9e0894066662a45333c8f9445c6ffc5e8099837a0a2e2b0c403
   languageName: node
   linkType: hard
 
@@ -1123,14 +1123,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@via-profit-services/knex@file://home/dhs/Projects/@via-profit-services/knex/package-1.0.0-rc.2.tgz::locator=%40via-profit-services%2Fsettings-manager%40workspace%3A.":
-  version: 1.0.0-rc.2
-  resolution: "@via-profit-services/knex@file://home/dhs/Projects/@via-profit-services/knex/package-1.0.0-rc.2.tgz::locator=%40via-profit-services%2Fsettings-manager%40workspace%3A."
+"@via-profit-services/knex@npm:^1.0.4":
+  version: 1.0.4
+  resolution: "@via-profit-services/knex@npm:1.0.4"
   peerDependencies:
     "@via-profit-services/core": 1.x.x
     knex: ^0.21.12
     pg: ^8.5.1
-  checksum: c16a949f8803a04d34dd3e185322f3677ce4bdadd5be3537e1183caa7f15b774f4c6a7473346a98707248ec55026fcd031ea5c3f582499e638fe2ea281c64e61
+  checksum: 9bcdc1ea983925449f77e44662caa9907014f84f4961a13b78bb02218775b7aee1e428157afb789389907d6f0fa7e9a63f521c8560424e247d5bdeaafc2ae8e0
   languageName: node
   linkType: hard
 
@@ -1155,9 +1155,9 @@ __metadata:
     "@types/webpack-node-externals": ^1.7.0
     "@typescript-eslint/eslint-plugin": ^4.6.1
     "@typescript-eslint/parser": ^4.6.1
-    "@via-profit-services/core": "file://home/dhs/Projects/@via-profit-services/core/package-1.0.0-rc.3.tgz"
+    "@via-profit-services/core": ^1.0.5
     "@via-profit-services/eslint-config": ^0.1.11
-    "@via-profit-services/knex": "file://home/dhs/Projects/@via-profit-services/knex/package-1.0.0-rc.2.tgz"
+    "@via-profit-services/knex": ^1.0.4
     "@zerollup/ts-transform-paths": ^1.7.11
     clean-webpack-plugin: ^3.0.0
     copy-webpack-plugin: ^5.1.1
