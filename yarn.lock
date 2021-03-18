@@ -1123,14 +1123,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@via-profit-services/knex@npm:^1.0.4":
-  version: 1.0.4
-  resolution: "@via-profit-services/knex@npm:1.0.4"
+"@via-profit-services/knex@npm:^1.0.5":
+  version: 1.0.5
+  resolution: "@via-profit-services/knex@npm:1.0.5"
   peerDependencies:
     "@via-profit-services/core": 1.x.x
     knex: ^0.21.12
     pg: ^8.5.1
-  checksum: 9bcdc1ea983925449f77e44662caa9907014f84f4961a13b78bb02218775b7aee1e428157afb789389907d6f0fa7e9a63f521c8560424e247d5bdeaafc2ae8e0
+  checksum: f84d9b96a2cc3444989cdec6b26d3f390706c70ef71740c8d39153b5ecf8731dfba3d2c0f6af55742573e350feb2567441b325851b89e20ad917102e69aae6bb
   languageName: node
   linkType: hard
 
@@ -1157,7 +1157,7 @@ __metadata:
     "@typescript-eslint/parser": ^4.6.1
     "@via-profit-services/core": ^1.0.5
     "@via-profit-services/eslint-config": ^0.1.11
-    "@via-profit-services/knex": ^1.0.4
+    "@via-profit-services/knex": ^1.0.5
     "@zerollup/ts-transform-paths": ^1.7.11
     clean-webpack-plugin: ^3.0.0
     copy-webpack-plugin: ^5.1.1

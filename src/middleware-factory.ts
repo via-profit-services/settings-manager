@@ -21,13 +21,13 @@ const settingsMiddlewareFactory: SettingsMiddlewareFactory = async (configuratio
     }
 
     // Inject Settings service
-    context.services.settings = context.services.settings ?? new SettingsManager({ context });
+    context.services.settings = new SettingsManager({ context });
 
     // register owner resolver
-    context.services.settings.ownerResolver = context.services.settings.ownerResolver ?? ownerResolver;
+    context.services.settings.ownerResolver = ownerResolver;
 
     // inject pseudoIDs dataloader
-    context.dataloader.settingsPseudos = context.dataloader.settingsPseudos ?? new DataLoader(async (pseudoIds: string[]) => {
+    context.dataloader.settingsPseudos = new DataLoader(async (pseudoIds: string[]) => {
       const nodes = await context.services.settings.resolveSettingsByPsudoIDs(pseudoIds);
 
       return pseudoIds.map((pseodoID) => nodes
@@ -35,7 +35,7 @@ const settingsMiddlewareFactory: SettingsMiddlewareFactory = async (configuratio
     });
 
     // inject standard dataloader
-    context.dataloader.settings = context.dataloader.settings ?? new DataLoader(async (ids: string[]) => {
+    context.dataloader.settings = new DataLoader(async (ids: string[]) => {
       const nodes = await context.services.settings.getSettingsByIds(ids);
 
       return collateForDataloader(ids, nodes);

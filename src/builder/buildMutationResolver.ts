@@ -52,10 +52,7 @@ const buildResolver = (props: SchemaBuilderParams['mutation']) => {
 
     const response = await dataloader.settingsPseudos.load(pseudoId);
 
-    return {
-      __typename: 'Somd',
-      ...response,
-    };
+    return response;
   }
 
   const resolvers: Resolvers = {
