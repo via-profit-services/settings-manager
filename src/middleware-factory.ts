@@ -7,20 +7,11 @@ import schemaBuilder from './schema-builder';
 import SettingsManager from './SettingsManager';
 
 const settingsMiddlewareFactory: SettingsMiddlewareFactory = async (configuration) => {
-
   const { settings, ownerResolver } = configuration;
-  const pool: ReturnType<Middleware> = {
-    context: null,
-  };
-
   const { typeDefs, resolvers } = schemaBuilder(settings);
+  let initDefaults = false;
 
-  const middleware: Middleware = async (props) => {
-    const { context } = props;
-
-    if (pool.context !== null) {
-      return pool;
-    }
+  const middleware: Middleware = async ({ context }) => {
 
     // check knex dependencies
     if (typeof context.knex === 'undefined') {
@@ -29,33 +20,37 @@ const settingsMiddlewareFactory: SettingsMiddlewareFactory = async (configuratio
       );
     }
 
-    pool.context = context;
-
     // Inject Settings service
-    pool.context.services.settings = new SettingsManager({ context });
+    context.services.settings = context.services.settings ?? new SettingsManager({ context });
 
     // register owner resolver
-    pool.context.services.settings.ownerResolver = ownerResolver;
+    context.services.settings.ownerResolver = context.services.settings.ownerResolver ?? ownerResolver;
 
-    // check default database
-    await pool.context.services.settings.writeDefaultSettings(settings);
-
-    // init pseudoIDs dataloader
-    pool.context.dataloader.settingsPseudos = new DataLoader(async (pseudoIds: string[]) => {
-      const nodes = await pool.context.services.settings.resolveSettingsByPsudoIDs(pseudoIds);
+    // inject pseudoIDs dataloader
+    context.dataloader.settingsPseudos = context.dataloader.settingsPseudos ?? new DataLoader(async (pseudoIds: string[]) => {
+      const nodes = await context.services.settings.resolveSettingsByPsudoIDs(pseudoIds);
 
       return pseudoIds.map((pseodoID) => nodes
-        .find((node) => pool.context.services.settings.dataToPseudoId(node) === pseodoID));
+        .find((node) => context.services.settings.dataToPseudoId(node) === pseodoID));
     });
 
-    // init standard dataloader
-    pool.context.dataloader.settings = new DataLoader(async (ids: string[]) => {
-      const nodes = await pool.context.services.settings.getSettingsByIds(ids);
+    // inject standard dataloader
+    context.dataloader.settings = context.dataloader.settings ?? new DataLoader(async (ids: string[]) => {
+      const nodes = await context.services.settings.getSettingsByIds(ids);
 
       return collateForDataloader(ids, nodes);
     });
 
-    return pool;
+
+    // check default database
+    if (!initDefaults) {
+      initDefaults = true;
+      await context.services.settings.writeDefaultSettings(settings);
+    }
+
+    return {
+      context,
+    };
   }
 
 
