@@ -1134,6 +1134,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@via-profit-services/redis@npm:^1.0.4":
+  version: 1.0.4
+  resolution: "@via-profit-services/redis@npm:1.0.4"
+  peerDependencies:
+    "@via-profit-services/core": ^1.1.9
+    ioredis: ^4.27.2
+  checksum: ea707e105d69d073db9c5c104fa9b575bb688260a0d85bc3924374f7c5b8508ee70f9bb0fd3f63bd760fd97b008605f7c540d8a3a0c330981460c67aeedd7c58
+  languageName: node
+  linkType: hard
+
 "@via-profit-services/settings-manager@workspace:.":
   version: 0.0.0-use.local
   resolution: "@via-profit-services/settings-manager@workspace:."
@@ -1158,11 +1168,12 @@ __metadata:
     "@via-profit-services/core": ^1.0.5
     "@via-profit-services/eslint-config": ^0.1.11
     "@via-profit-services/knex": ^1.0.5
+    "@via-profit-services/redis": ^1.0.4
+    "@via-profit/dataloader": ^1.0.0
     "@zerollup/ts-transform-paths": ^1.7.11
     clean-webpack-plugin: ^3.0.0
     copy-webpack-plugin: ^5.1.1
     cross-env: ^6.0.3
-    dataloader: ^2.0.0
     dotenv: ^8.2.0
     eslint: ^7.12.1
     eslint-config-prettier: ^6.15.0
@@ -1180,7 +1191,7 @@ __metadata:
     graphql: ^15.4.0
     graphql-import-node: ^0.0.4
     graphql-tag: ^2.11.0
-    ioredis: ^4.19.4
+    ioredis: ^4.27.3
     jest: ^24.9.0
     jest-transform-graphql: ^2.1.0
     knex: ^0.21.14
@@ -1213,13 +1224,22 @@ __metadata:
   peerDependencies:
     "@via-profit-services/core": ^1.0.0
     "@via-profit-services/knex": ^1.0.0
-    dataloader: "*"
+    "@via-profit/dataloader": ^1.0.0
     graphql: "*"
     moment: "*"
     moment-timezone: "*"
     uuid: "*"
   languageName: unknown
   linkType: soft
+
+"@via-profit/dataloader@npm:^1.0.0":
+  version: 1.0.0
+  resolution: "@via-profit/dataloader@npm:1.0.0"
+  peerDependencies:
+    ioredis: ^4.27.2
+  checksum: b2d9436ed6c0ab2f785b1401928089f084e0e2c88a215ac295db09d59a562a25891b5b632e9b9f9f0adc13eb05ede9b14bda5bbfdbb7e3160cc96ae144b9f95f
+  languageName: node
+  linkType: hard
 
 "@webassemblyjs/ast@npm:1.9.1":
   version: 1.9.1
@@ -3563,13 +3583,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"dataloader@npm:^2.0.0":
-  version: 2.0.0
-  resolution: "dataloader@npm:2.0.0"
-  checksum: 0165c2e80751d269c33d2a14b0078a4f3853cb010e2531e7aa99523aba8d0cdc922b9ad67e4c2bb9074c90e0ee0a41b6e7f5f63c40d31224a71c8a0b703f4be3
-  languageName: node
-  linkType: hard
-
 "debug@npm:2.6.9, debug@npm:^2.2.0, debug@npm:^2.3.3, debug@npm:^2.6.9":
   version: 2.6.9
   resolution: "debug@npm:2.6.9"
@@ -3606,6 +3619,18 @@ __metadata:
   dependencies:
     ms: ^2.1.1
   checksum: 3601a6ce96e4698ed3edf0ee6e67ef0317adfcdae2f66a43b23d1b14e8888b422337429b16dbbcba6801e7bfa6cbb8de3128fbacfb8ae1cd9bd7615ea6baf970
+  languageName: node
+  linkType: hard
+
+"debug@npm:^4.3.1":
+  version: 4.3.2
+  resolution: "debug@npm:4.3.2"
+  dependencies:
+    ms: 2.1.2
+  peerDependenciesMeta:
+    supports-color:
+      optional: true
+  checksum: 5543570879e2274f6725d4285a034d6e0822d35faefc6f55965933fb440e8c21eb3a0bef934e66f4b6b491f898ee2de37cab980e9d4fd61372136c19d3ce4527
   languageName: node
   linkType: hard
 
@@ -6266,21 +6291,21 @@ fsevents@~2.1.2:
   languageName: node
   linkType: hard
 
-"ioredis@npm:^4.19.4":
-  version: 4.19.4
-  resolution: "ioredis@npm:4.19.4"
+"ioredis@npm:^4.27.3":
+  version: 4.27.3
+  resolution: "ioredis@npm:4.27.3"
   dependencies:
     cluster-key-slot: ^1.1.0
-    debug: ^4.1.1
+    debug: ^4.3.1
     denque: ^1.1.0
     lodash.defaults: ^4.2.0
     lodash.flatten: ^4.4.0
     p-map: ^2.1.0
-    redis-commands: 1.6.0
+    redis-commands: 1.7.0
     redis-errors: ^1.2.0
     redis-parser: ^3.0.0
-    standard-as-callback: ^2.0.1
-  checksum: 56233d5676d559fdca77376487cf93c7b2275bfe40ccf53392a4eba686392fd9c1123ac2c0a32bc4d302da5bcd8711e1a6f17a222d288915a637100534a4e6de
+    standard-as-callback: ^2.1.0
+  checksum: f7080a5912fed5e4ebec45be37eb7288049d5865f9e02e77bcb135533d88c93766a5eea95ead973cbadcdbaf7e15019fb7f6e3286a5c5a820dcd945cc345dd2f
   languageName: node
   linkType: hard
 
@@ -10255,10 +10280,10 @@ fsevents@~2.1.2:
   languageName: node
   linkType: hard
 
-"redis-commands@npm:1.6.0":
-  version: 1.6.0
-  resolution: "redis-commands@npm:1.6.0"
-  checksum: 11ad01e57fab4927c7410817fcaaf71079d5b50ebb05f9b38ba5719b9461e7b78f7a3f1f8a6d352336a6af336ef4fdc9a21ff1abb5111890edb71d56634ff53f
+"redis-commands@npm:1.7.0":
+  version: 1.7.0
+  resolution: "redis-commands@npm:1.7.0"
+  checksum: cbf5d33768b1c8e1001e2a7ffdaeb6ef830c538ef812d803a1c5e6038cf03482cf0a22b29eadf1182aa02a522331826e3af0967ae75fa7883da8a139ad2fc77b
   languageName: node
   linkType: hard
 
@@ -11368,10 +11393,10 @@ resolve@1.1.7:
   languageName: node
   linkType: hard
 
-"standard-as-callback@npm:^2.0.1":
-  version: 2.0.1
-  resolution: "standard-as-callback@npm:2.0.1"
-  checksum: 58a0ddb90d674f6af7e099c1fedd339276e98a218fd88f1a6134a4910c5ff8d272815cf8cc758b2d61fa3f523853c8fa6ef3cb0692912e7ff35870dedffa8ffc
+"standard-as-callback@npm:^2.1.0":
+  version: 2.1.0
+  resolution: "standard-as-callback@npm:2.1.0"
+  checksum: 4d02327de69a3d867b8b4a069213b90ee5db4d09364fea694e3f67f8b1ee909be0724a0c8e8ee220365c972363d318242d97d7dd1c79ccf84b8bb52234be525e
   languageName: node
   linkType: hard
 

@@ -14,7 +14,7 @@ const buildResolver = (props: SchemaBuilderParams['mutation']) => {
     const owner = services.settings.ownerResolver(context);
     const pseudoId = services.settings.dataToPseudoId({ category, name, owner });
 
-    dataloader.settingsPseudos.clear(pseudoId);
+    await dataloader.settingsPseudos.clear(pseudoId);
 
     // get old settings if exist
     const [settingsField] = await services.settings.getSettings({

@@ -1,6 +1,6 @@
-import { collateForDataloader, Middleware, ServerError } from '@via-profit-services/core';
+import { Middleware, ServerError } from '@via-profit-services/core';
 import type { SettingsMiddlewareFactory } from '@via-profit-services/settings-manager';
-import DataLoader from 'dataloader';
+import DataLoader from '@via-profit/dataloader';
 import '@via-profit-services/knex';
 
 import schemaBuilder from './schema-builder';
@@ -32,13 +32,21 @@ const settingsMiddlewareFactory: SettingsMiddlewareFactory = async (configuratio
 
       return pseudoIds.map((pseodoID) => nodes
         .find((node) => context.services.settings.dataToPseudoId(node) === pseodoID));
+    }, {
+      redis: context.redis,
+      cacheName: 'settings.pseudos',
+      defaultExpiration: '1d',
     });
 
     // inject standard dataloader
     context.dataloader.settings = new DataLoader(async (ids: string[]) => {
       const nodes = await context.services.settings.getSettingsByIds(ids);
 
-      return collateForDataloader(ids, nodes);
+      return nodes;
+    }, {
+      redis: context.redis,
+      cacheName: 'settings',
+      defaultExpiration: '1d',
     });
 
 

@@ -228,18 +228,18 @@ declare module '@via-profit-services/settings-manager' {
 
 
 declare module '@via-profit-services/core' {
-  import DataLoader from 'dataloader';
+  import DataLoader from '@via-profit/dataloader';
   import { SettingsService, SettingsNode } from '@via-profit-services/settings-manager';
 
   interface DataLoaderCollection {
     /**
      * Settings dataloader by pseudo IDs
      */
-    settingsPseudos: DataLoader<string, Node<SettingsNode>>;
+    settingsPseudos: DataLoader<SettingsNode>;
     /**
      * Settings dataloader by IDs
      */
-    settings: DataLoader<string, Node<SettingsNode>>;
+    settings: DataLoader<SettingsNode>;
   }
 
   interface ServicesCollection {
