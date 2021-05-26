@@ -1,7 +1,6 @@
 import { Middleware, ServerError } from '@via-profit-services/core';
 import type { SettingsMiddlewareFactory } from '@via-profit-services/settings-manager';
 import DataLoader from '@via-profit/dataloader';
-import '@via-profit-services/knex';
 
 import schemaBuilder from './schema-builder';
 import SettingsManager from './SettingsManager';
@@ -19,6 +18,11 @@ const settingsMiddlewareFactory: SettingsMiddlewareFactory = async (configuratio
         '«@via-profit-services/knex» middleware is missing. If knex middleware is already connected, make sure that the connection order is correct: knex middleware must be connected before',
       );
     }
+    if (typeof context.redis === 'undefined') {
+      throw new ServerError(
+        '«@via-profit-services/redis» middleware is missing. If Redis middleware is already connected, make sure that the connection order is correct: redis middleware must be connected before',
+      );
+    }
 
     // Inject Settings service
     context.services.settings = new SettingsManager({ context });
@@ -28,10 +32,9 @@ const settingsMiddlewareFactory: SettingsMiddlewareFactory = async (configuratio
 
     // inject pseudoIDs dataloader
     context.dataloader.settingsPseudos = new DataLoader(async (pseudoIds: string[]) => {
-      const nodes = await context.services.settings.resolveSettingsByPsudoIDs(pseudoIds);
+      const nodes = await context.services.settings.getSettingsByPsudoIds(pseudoIds);
 
-      return pseudoIds.map((pseodoID) => nodes
-        .find((node) => context.services.settings.dataToPseudoId(node) === pseodoID));
+      return nodes;
     }, {
       redis: context.redis,
       cacheName: 'settings.pseudos',
@@ -45,7 +48,7 @@ const settingsMiddlewareFactory: SettingsMiddlewareFactory = async (configuratio
       return nodes;
     }, {
       redis: context.redis,
-      cacheName: 'settings',
+      cacheName: 'settings.list',
       defaultExpiration: '1d',
     });
 

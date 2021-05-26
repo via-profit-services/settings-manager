@@ -2,7 +2,7 @@ import { OutputFilter } from '@via-profit-services/core';
 import { convertWhereToKnex, convertOrderByToKnex, convertSearchToKnex } from '@via-profit-services/knex';
 import type {
   SettingsNode, SettingsParsed, SettingsServiceProps, SettingsTableModel,
-  SettingsTableModelResult, OwnerResolverFunc, SettingsMap,
+  SettingsTableModelResult, OwnerResolverFunc, SettingsMap, SettingsNodePseudos,
  } from '@via-profit-services/settings-manager';
 import moment from 'moment-timezone';
 import { v4 as uuidv4 } from 'uuid';
@@ -152,7 +152,7 @@ class SettingsService {
     return deletedId;
   }
 
-  public async resolveSettingsByPsudoIDs(pseudoIds: string[]): Promise<SettingsNode[]> {
+  public async getSettingsByPsudoIds(pseudoIds: string[]): Promise<SettingsNodePseudos[]> {
     const nodes = await this.getSettingsByPseudoIds(pseudoIds);
 
     const resolveSettings = async (pseudoID: string) => {
@@ -161,7 +161,13 @@ class SettingsService {
       const settings = settingsList.find((s) => s.owner === (owner || null));
 
       if (settings) {
-        return settings;
+        const settingsNodePseudos: SettingsNodePseudos = {
+          ...settings,
+          settingsID: settings.id,
+          id: pseudoID,
+        }
+
+        return settingsNodePseudos;
       }
 
       const newSettings: SettingsNode = {
@@ -178,7 +184,13 @@ class SettingsService {
 
       await this.createSettings(newSettings);
 
-      return newSettings;
+      const settingsNodePseudos: SettingsNodePseudos = {
+        ...newSettings,
+        settingsID: newSettings.id,
+        id: pseudoID,
+      }
+
+      return settingsNodePseudos;
     }
 
     const result = Promise.all(pseudoIds.map(resolveSettings));

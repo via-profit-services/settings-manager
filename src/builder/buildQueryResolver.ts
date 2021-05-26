@@ -1,6 +1,5 @@
 import { BadRequestError } from '@via-profit-services/core';
-import type { ValuesResolver, Resolvers, MutationResolver, SchemaBuilderParams } from '@via-profit-services/settings-manager';
-import { toNamespacedPath } from 'path';
+import type { ValuesResolver, Resolvers, SchemaBuilderParams } from '@via-profit-services/settings-manager';
 
 const buildResolver = (props: SchemaBuilderParams['query']) => {
   const { categories, names } = props;

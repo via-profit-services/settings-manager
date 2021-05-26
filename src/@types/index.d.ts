@@ -148,7 +148,7 @@ declare module '@via-profit-services/settings-manager' {
   }
 
 
-  export interface SettingsNode {
+  export type SettingsNode = {
     id: string;
     createdAt: Date;
     updatedAt: Date;
@@ -157,6 +157,10 @@ declare module '@via-profit-services/settings-manager' {
     name: string;
     value: string | number | boolean | null;
     comment: string;
+  }
+
+  export type SettingsNodePseudos = SettingsNode & {
+    settingsID: string;
   }
 
 
@@ -215,7 +219,7 @@ declare module '@via-profit-services/settings-manager' {
      */
     deleteSettings(id: string): Promise<string>;
 
-    resolveSettingsByPsudoIDs(pseudoIds: string[]): Promise<SettingsNode[]>;
+    getSettingsByPsudoIds(pseudoIds: string[]): Promise<SettingsNodePseudos[]>;
 
     writeDefaultSettings(settingsMap: SettingsMap): Promise<void>;
 
@@ -229,13 +233,13 @@ declare module '@via-profit-services/settings-manager' {
 
 declare module '@via-profit-services/core' {
   import DataLoader from '@via-profit/dataloader';
-  import { SettingsService, SettingsNode } from '@via-profit-services/settings-manager';
+  import { SettingsService, SettingsNode, SettingsNodePseudos } from '@via-profit-services/settings-manager';
 
   interface DataLoaderCollection {
     /**
      * Settings dataloader by pseudo IDs
      */
-    settingsPseudos: DataLoader<SettingsNode>;
+    settingsPseudos: DataLoader<SettingsNodePseudos>;
     /**
      * Settings dataloader by IDs
      */

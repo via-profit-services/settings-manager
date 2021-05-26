@@ -76,7 +76,7 @@ const server = http.createServer(app);
     ],
   });
 
-  app.use(graphQLExpress);
+  app.use('/graphql', graphQLExpress);
   server.listen(PORT, () => {
     console.log(`GraphQL Server started at http://localhost:${PORT}/graphql`);
   })
