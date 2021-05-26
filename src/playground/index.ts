@@ -31,22 +31,48 @@ const server = http.createServer(app);
   const settings = await settingsFactory({
     ownerResolver: () => '270fedda-81ba-4e5a-b3e1-098c155a0a33',
     settings: {
-      ui: {
+      uiweb: {
         theme: {
-          enum: ['standard', 'standardDark'],
+          enum: ['standardDark', 'standard'],
           defaultValue: 'standard',
         },
         locale: {
-          enum: ['ru', 'en', 'fr'],
-          defaultValue: 'fr',
+          enum: ['ru', 'en'],
+          defaultValue: 'ru',
+        },
+        fontSize: {
+          enum: ['small', 'default', 'normal', 'medium', 'large', 'giant'],
+          defaultValue: 'default',
         },
         drawer: {
           bool: true,
           defaultValue: true,
         },
+      },
+      uimobile: {
+        theme: {
+          enum: ['standardDark', 'standard'],
+          defaultValue: 'standard',
+        },
+        locale: {
+          enum: ['ru', 'en'],
+          defaultValue: 'ru',
+        },
         fontSize: {
+          enum: ['small', 'default', 'normal', 'medium', 'large', 'giant'],
+          defaultValue: 'default',
+        },
+      },
+      legalEntities: {
+        company: {
+          string: true,
+          defaultValue: '[]',
+        },
+      },
+      misc: {
+        driverSalaryKmFactor: {
           int: true,
-          defaultValue: 12,
+          defaultValue: 1.5,
         },
       },
     },
